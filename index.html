@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wardrobe Builder Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* A light gray background */
+        }
+        /* Custom scrollbar */
+        .closet-items::-webkit-scrollbar { width: 8px; }
+        .closet-items::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; }
+        .closet-items::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 10px; }
+        .closet-items::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        
+        .mannequin-slot {
+            transition: background-image 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .item-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .item-card.selected {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            position: relative;
+            background-color: #ffffff;
+            margin: auto;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #333;
+            text-decoration: none;
+            outline: none;
+        }
+
+        /* Gallery Styles */
+        .gallery-card {
+            height: 250px;
+            background-color: #e5e7eb;
+        }
+        .gallery-slot {
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* View Toggle Styles */
+        .view-toggle button {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .view-toggle button.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        .view-toggle button.inactive {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Wardrobe Builder</h1>
+            <p class="text-lg text-gray-600 mt-2">Create, share, and view outfits in the virtual fashion show!</p>
+        </header>
+
+        <!-- View Toggle -->
+        <div class="flex justify-center mb-6 view-toggle bg-gray-200 p-1 rounded-lg max-w-sm mx-auto">
+            <button id="showBuilderBtn" class="w-1/2 py-2 px-4 rounded-md font-semibold active">Outfit Builder</button>
+            <button id="showGalleryBtn" class="w-1/2 py-2 px-4 rounded-md font-semibold inactive">Fashion Show</button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="main-content">
+            <!-- View 1: The Builder -->
+            <main id="builder-view" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Side: Mannequin -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-center">Your Outfit</h2>
+                    <div id="mannequin" class="relative w-full max-w-sm mx-auto h-[400px] md:h-[500px] bg-gray-200 rounded-lg flex flex-col items-center justify-center overflow-hidden">
+                        <!-- This container will hold all the clothing slots -->
+                        <div class="absolute inset-0">
+                            <div id="mannequin-tops" class="mannequin-slot absolute top-0 left-0 w-full h-1/2"></div>
+                            <!-- <div id="mannequin-outerwear" ...> MOVED -->
+                            <div id="mannequin-bottoms" class="mannequin-slot absolute bottom-[25%] left-0 w-full h-1/2"></div>
+                            <div id="mannequin-shoes" class="mannequin-slot absolute bottom-0 left-0 w-full h-1/4"></div>
+                            <!-- <div id="mannequin-accessories" ...> MOVED -->
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-32 h-32 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 1 0 5 5a5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3a3 3 0 0 1-3 3zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z"/></svg>
+                    </div>
+
+                    <!-- New Grid for Extras -->
+                    <div class="grid grid-cols-2 gap-4 mt-4 max-w-sm mx-auto">
+                        <div>
+                            <h3 class="text-sm font-semibold text-center text-gray-600 mb-1">Outerwear</h3>
+                            <div id="mannequin-outerwear" class="mannequin-slot relative w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <span class="text-gray-400 text-xs p-2 text-center">Outerwear</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-center text-gray-600 mb-1">Accessory</h3>
+                            <div id="mannequin-accessories" class="mannequin-slot relative w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                                 <span class="text-gray-400 text-xs p-2 text-center">Accessory</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <button id="randomizeBtn" class="w-1/3 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-colors">Random</button>
+                        <button id="clearBtn" class="w-1/3 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-colors">Clear</button>
+                    </div>
+                     <button id="submitOutfitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors mt-4">
+                        Submit Outfit to Show
+                    </button>
+                </div>
+
+                <!-- Right Side: Closet/Wardrobe -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-center">Your Closet</h2>
+                    <div id="closet" class="space-y-6">
+                        <!-- Categories will be injected here by JavaScript -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- View 2: The Fashion Show Gallery -->
+            <div id="gallery-view" class="hidden">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-3xl font-semibold mb-4 text-center">Fashion Show Gallery</h2>
+                    <div class="max-w-2xl mx-auto text-center">
+                        <label for="outfitCodes" class="block text-md font-medium text-gray-700 mb-2">Paste all outfit codes here (one per line):</label>
+                        <textarea id="outfitCodes" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste codes from your group chat or Google Doc..."></textarea>
+                        <button id="loadShowBtn" class="mt-4 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
+                            Load Fashion Show
+                        </button>
+                    </div>
+
+                    <div class="border-t border-gray-200 mt-8 pt-6">
+                        <div id="fashion-show-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <!-- Outfits will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Outfit Modal -->
+    <div id="submitModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="closeModalBtn" class="modal-close">&times;</span>
+            <h3 class="text-2xl font-semibold mb-4">Submit Your Outfit!</h3>
+            <p class="text-gray-600 mb-4">Your outfit is ready! Copy the code below and paste it into your shared group chat, email, or document to add it to the fashion show.</p>
+            <div class="relative">
+                <input type="text" id="outfitCodeOutput" readonly class="w-full bg-gray-100 border border-gray-300 text-gray-700 p-3 rounded-lg pr-24" />
+                <button id="copyCodeBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700">Copy</button>
+            </div>
+            <p id="copyFeedback" class="text-green-600 text-sm mt-2 h-4"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATABASE ---
+            const closetData = {
+                tops: [
+                    { id: 1, name: '2025 Rollneck Sweater', imageUrl: 'https://i.postimg.cc/4YWnqWD3/2025-Rollneck-sweater-CM712.png' },
+                    { id: 2, name: 'Cashmere Classic-Fit Crewneck Sweater', imageUrl: 'https://i.postimg.cc/9c4BkH7x/Cashmere-classic-fit-crewneck-sweater-BA400.png' },
+                    { id: 3, name: 'Feather Jersey Turtleneck', imageUrl: 'https://i.postimg.cc/D7WcN3X6/Feather-jersey-turtleneck-CN176.png' },
+                    { id: 4, name: 'Garcon Classic Shirt in Cotton Poplin', imageUrl: 'https://i.postimg.cc/fM3vPQ9B/Garcon-classic-shirt-in-cotton-poplin-BY716.png' },
+                ],
+                bottoms: [
+                    { id: 1, name: 'Barrel Leg Jeans', imageUrl: 'https://i.postimg.cc/qpSNvzvG/Barrel-leg-jean-CK153.png' },
+                    { id: 2, name: 'Black Cosmo Pant in Luster Charmeuse', imageUrl: 'https://i.postimg.cc/CwzZ0jSt/Cosmo-pant-in-luster-charmeuse-CN714-Black.png' },
+                    { id: 3, name: 'Essential Wide-Leg Pant in Italian Studio Wool Blend', imageUrl: 'https://i.postimg.cc/HTVJmQdN/Essential-wide-leg-pant-in-Italian-studio-wool-blend-CN722.png' },
+                    { id: 4, name: 'New Gwyneth Slip Skirt in Viscose Charmeuse', imageUrl: 'https://i.postimg.cc/XWm61dDD/New-Gwyneth-slip-skirt-in-viscose-charmeuse-CI640.png' },
+                ],
+                shoes: [
+                    { id: 1, name: 'Maison Tassel Loafers in Leather', imageUrl: 'https://i.postimg.cc/NBy36M45/Maison-tassel-loafers-in-leather-CM906.png' },
+                    { id: 2, name: 'New Stevie Ankle Boots in Leopard Print Calf Hair', imageUrl: 'https://i.postimg.cc/PTLgWx4T/New-Stevie-ankle-boots-in-leopard-print-calf-hair-CM915.png' },
+                    { id: 3, name: 'New Stevie Knee-High Boots in Leather', imageUrl: 'https://i.postimg.cc/5bHhB03d/New-Stevie-knee-high-boots-in-leather-CM917.png' },
+                    { id: 4, name: 'Nike Killshot 2 Sneakers', imageUrl: 'https://i.postimg.cc/bpG7xJR4/Nike-Killshot-2-sneakers-CP794.png' },
+                ],
+                accessories: [
+                    { id: 1, name: 'Gold Vermeil Hoop Earrings', imageUrl: 'https://i.postimg.cc/p2nNggYw/Gold_vermeil_hoop_earrings_CN560.png' },
+                    { id: 2, name: 'Metallic Chainlink Bracelet', imageUrl: 'https://i.postimg.cc/KZgXddDh/Metallic_chainlink_bracelet_BS720.png' },
+                    { id: 3, name: 'Metallic Chainlink Necklace', imageUrl: 'https://i.postimg.cc/F9Jt22Vt/Metallic_chainlink_necklace_BS719.png' },
+                    { id: 4, name: 'Ribbed Cashmere Beanie', imageUrl: 'https://i.postimg.cc/5xFcZZSd/Ribbed_cashmere_beanie_CE240.png' },
+                    { id: 5, name: 'Wool Cashmere Blend Bandana', imageUrl: 'https://i.postimg.cc/81r8qqmG/Wool_cashmere_blend_bandana_CN207.png' },
+                ],
+                outerwear: [
+                    { id: 1, name: 'New Icon Trench Coat', imageUrl: 'https://i.postimg.cc/4G8Qhm6h/New_Icon_trench_coat_BF456.png' },
+                    { id: 2, name: 'New Classic Denim Jacket', imageUrl: 'https://i.postimg.cc/Mwsmjv7Q/New_classic_denim_jacket_in_Alicia_wash_BY013.png' },
+                    { id: 3, name: 'Chiara Topcoat in Italian Double Face', imageUrl: 'https://i.postimg.cc/hKdpgg67/Chiara-topcoat-in-Italian-double-face-CN071.png' },
+                ]
+            };
+
+            let currentOutfit = {
+                tops: null,
+                bottoms: null,
+                shoes: null,
+                accessories: null,
+                outerwear: null
+            };
+
+            // --- BUILDER ELEMENTS ---
+            const closetElement = document.getElementById('closet');
+            const randomizeBtn = document.getElementById('randomizeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const mannequinIcon = document.querySelector('#mannequin svg');
+            
+            // --- VIEW TOGGLE ELEMENTS ---
+            const showBuilderBtn = document.getElementById('showBuilderBtn');
+            const showGalleryBtn = document.getElementById('showGalleryBtn');
+            const builderView = document.getElementById('builder-view');
+            const galleryView = document.getElementById('gallery-view');
+
+            // --- MODAL ELEMENTS ---
+            const submitOutfitBtn = document.getElementById('submitOutfitBtn');
+            const submitModal = document.getElementById('submitModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const outfitCodeOutput = document.getElementById('outfitCodeOutput');
+            const copyCodeBtn = document.getElementById('copyCodeBtn');
+            const copyFeedback = document.getElementById('copyFeedback');
+
+            // --- GALLERY ELEMENTS ---
+            const outfitCodesInput = document.getElementById('outfitCodes');
+            const loadShowBtn = document.getElementById('loadShowBtn');
+            const fashionShowGrid = document.getElementById('fashion-show-grid');
+
+            // --- FUNCTIONS ---
+
+            // Function to render all items in the closet
+            function renderCloset() {
+                closetElement.innerHTML = ''; // Clear existing content
+                for (const category in closetData) {
+                    const categoryContainer = document.createElement('div');
+                    
+                    const categoryTitle = document.createElement('h3');
+                    categoryTitle.className = 'text-xl font-semibold capitalize text-gray-700 border-b-2 border-gray-200 pb-2 mb-4';
+                    categoryTitle.textContent = category;
+                    categoryContainer.appendChild(categoryTitle);
+
+                    const itemsGrid = document.createElement('div');
+                    itemsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4';
+
+                    closetData[category].forEach(item => {
+                        const itemCard = document.createElement('div');
+                        itemCard.className = 'item-card cursor-pointer border-2 border-transparent bg-gray-100 p-2 rounded-lg text-center';
+                        itemCard.dataset.category = category;
+                        itemCard.dataset.id = item.id;
+
+                        const itemImg = document.createElement('img');
+                        itemImg.src = item.imageUrl;
+                        itemImg.alt = item.name;
+                        itemImg.className = 'w-full h-24 md:h-32 object-contain rounded-md mb-2';
+                        // Handle image loading errors
+                        itemImg.onerror = () => {
+                            itemImg.src = `https://placehold.co/200x200/CCCCCC/FFFFFF?text=Error`;
+                            itemImg.alt = 'Image not found';
+                        };
+
+                        const itemName = document.createElement('p');
+                        itemName.className = 'text-sm font-medium text-gray-700';
+                        itemName.textContent = item.name;
+
+                        itemCard.appendChild(itemImg);
+                        itemCard.appendChild(itemName);
+                        itemsGrid.appendChild(itemCard);
+
+                        itemCard.addEventListener('click', () => selectItem(category, item.id));
+                    });
+
+                    categoryContainer.appendChild(itemsGrid);
+                    closetElement.appendChild(categoryContainer);
+                }
+            }
+            
+            // Function to handle item selection
+            function selectItem(category, itemId) {
+                const selectedItem = closetData[category].find(item => item.id === itemId);
+                
+                if (currentOutfit[category] && currentOutfit[category].id === itemId) {
+                    currentOutfit[category] = null;
+                } else {
+                    currentOutfit[category] = selectedItem;
+                }
+                
+                updateMannequin();
+                updateSelectedStyles();
+            }
+            
+            // Function to update the mannequin display
+            function updateMannequin() {
+                let isMainOutfitEmpty = true;
+                
+                for (const category in currentOutfit) {
+                    const mannequinSlot = document.getElementById(`mannequin-${category}`);
+                    if (!mannequinSlot) continue; // Skip if slot doesn't exist
+
+                    if (currentOutfit[category]) {
+                        mannequinSlot.style.backgroundImage = `url(${currentOutfit[category].imageUrl})`;
+                        
+                        // If it's a main category, set flag
+                        if (['tops', 'bottoms', 'shoes'].includes(category)) {
+                            isMainOutfitEmpty = false;
+                        }
+                        
+                        // Hide placeholder text in new boxes
+                        const placeholder = mannequinSlot.querySelector('span');
+                        if (placeholder) placeholder.style.opacity = '0';
+
+                    } else {
+                        mannequinSlot.style.backgroundImage = 'none';
+                        
+                        // Show placeholder text in new boxes
+                        const placeholder = mannequinSlot.querySelector('span');
+                        if (placeholder) placeholder.style.opacity = '1';
+                    }
+                }
+                
+                // Show/hide the main mannequin icon
+                mannequinIcon.style.display = isMainOutfitEmpty ? 'block' : 'none';
+            }
+            
+            // Function to highlight selected items in the closet
+            function updateSelectedStyles() {
+                document.querySelectorAll('.item-card').forEach(card => {
+                    const category = card.dataset.category;
+                    const id = parseInt(card.dataset.id);
+                    if (currentOutfit[category] && currentOutfit[category].id === id) {
+                        card.classList.add('selected');
+                    } else {
+                        card.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Function to randomize the outfit
+            function randomizeOutfit() {
+                // --- 1. Pick a random item for each category independently ---
+                for (const category in closetData) {
+                    const items = closetData[category];
+                    const randomIndex = Math.floor(Math.random() * items.length);
+                    currentOutfit[category] = items[randomIndex];
+                }
+
+                // --- 2. Define and apply your styling rule ---
+                const ruleShoeId = 3; // 'New Stevie Knee-High Boots in Leather'
+                const ruleBottomId = 4; // 'New Gwyneth Slip Skirt in Viscose Charmeuse'
+
+                // Get the IDs of the randomly selected items
+                const selectedShoeId = currentOutfit.shoes ? currentOutfit.shoes.id : 0;
+                const selectedBottomId = currentOutfit.bottoms ? currentOutfit.bottoms.id : 0;
+
+                // RULE: If the boots (shoe:3) are selected, the skirt (bottom:4) MUST be selected.
+                if (selectedShoeId === ruleShoeId && selectedBottomId !== ruleBottomId) {
+                    // Fix the outfit: Force the bottoms to be the skirt
+                    currentOutfit.bottoms = closetData.bottoms.find(item => item.id === ruleBottomId);
+                }
+                
+                // INVERSE RULE: If the skirt (bottom:4) is selected, the boots (shoe:3) MUST be selected.
+                // This makes them a "locked pair" in the randomizer.
+                else if (selectedBottomId === ruleBottomId && selectedShoeId !== ruleShoeId) {
+                    // Fix the outfit: Force the shoes to be the boots
+                    currentOutfit.shoes = closetData.shoes.find(item => item.id === ruleShoeId);
+                }
+
+                // --- 3. Update the UI ---
+                updateMannequin();
+                updateSelectedStyles();
+            }
+            
+            // Function to clear the outfit
+            function clearOutfit() {
+                 for (const category in currentOutfit) {
+                    currentOutfit[category] = null;
+                }
+                updateMannequin();
+                updateSelectedStyles();
+            }
+
+            // --- NEW: View Toggling ---
+            function toggleView(viewToShow) {
+                if (viewToShow === 'builder') {
+                    builderView.style.display = 'grid';
+                    galleryView.style.display = 'none';
+                    showBuilderBtn.classList.add('active');
+                    showBuilderBtn.classList.remove('inactive');
+                    showGalleryBtn.classList.add('inactive');
+                    showGalleryBtn.classList.remove('active');
+                } else {
+                    builderView.style.display = 'none';
+                    galleryView.style.display = 'block';
+                    showBuilderBtn.classList.add('inactive');
+                    showBuilderBtn.classList.remove('active');
+                    showGalleryBtn.classList.add('active');
+                    showGalleryBtn.classList.remove('inactive');
+                }
+            }
+
+            // --- NEW: Modal and Sharing Functions ---
+            function openSubmitModal() {
+                // Generate the code: topId-bottomId-shoeId-accessoryId-outerwearId
+                // Use '0' if no item is selected
+                const code = [
+                    currentOutfit.tops ? currentOutfit.tops.id : 0,
+                    currentOutfit.bottoms ? currentOutfit.bottoms.id : 0,
+                    currentOutfit.shoes ? currentOutfit.shoes.id : 0,
+                    currentOutfit.accessories ? currentOutfit.accessories.id : 0,
+                    currentOutfit.outerwear ? currentOutfit.outerwear.id : 0
+                ].join('-');
+                
+                outfitCodeOutput.value = code;
+                copyFeedback.textContent = '';
+                submitModal.style.display = 'flex';
+            }
+
+            function closeSubmitModal() {
+                submitModal.style.display = 'none';
+            }
+
+            function copyCodeToClipboard() {
+                outfitCodeOutput.select();
+                outfitCodeOutput.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    document.execCommand('copy');
+                    copyFeedback.textContent = 'Copied to clipboard!';
+                } catch (err) {
+                    copyFeedback.textContent = 'Failed to copy. Please copy manually.';
+                }
+            }
+
+            // --- NEW: Gallery Functions ---
+            function loadFashionShow() {
+                const codes = outfitCodesInput.value.trim().split('\n');
+                fashionShowGrid.innerHTML = ''; // Clear previous gallery
+
+                codes.forEach(code => {
+                    if (!code) return; // Skip empty lines
+
+                    const ids = code.split('-');
+                    if (ids.length !== 5) return; // Skip invalid codes
+
+                    const outfit = {
+                        tops: closetData.tops.find(item => item.id === parseInt(ids[0])),
+                        bottoms: closetData.bottoms.find(item => item.id === parseInt(ids[1])),
+                        shoes: closetData.shoes.find(item => item.id === parseInt(ids[2])),
+                        accessories: closetData.accessories.find(item => item.id === parseInt(ids[3])),
+                        outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4]))
+                    };
+
+                    renderOutfitCard(outfit, code);
+                });
+            }
+
+            function renderOutfitCard(outfit, code) {
+                const card = document.createElement('div');
+                card.className = 'relative gallery-card w-full rounded-lg overflow-hidden shadow-md';
+
+                // We'll create stacked slots just like the mannequin
+                const topSlot = document.createElement('div');
+                topSlot.className = 'gallery-slot absolute top-0 left-0 w-full h-1/2';
+                if (outfit.tops) topSlot.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+
+                const outerwearSlot = document.createElement('div');
+                outerwearSlot.className = 'gallery-slot absolute top-0 left-0 w-full h-1/2';
+                if (outfit.outerwear) outerwearSlot.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
+
+                const bottomSlot = document.createElement('div');
+                bottomSlot.className = 'gallery-slot absolute bottom-[25%] left-0 w-full h-1/2';
+                if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+                
+                const shoeSlot = document.createElement('div');
+                shoeSlot.className = 'gallery-slot absolute bottom-0 left-0 w-full h-1/4';
+                if (outfit.shoes) shoeSlot.style.backgroundImage = `url(${outfitt.shoes.imageUrl})`;
+
+                const accessorySlot = document.createElement('div');
+                accessorySlot.className = 'gallery-slot absolute top-[-5%] left-0 w-full h-1/4';
+                if (outfit.accessories) accessorySlot.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
+
+                // Add a label to show the code
+                const codeLabel = document.createElement('div');
+                codeLabel.className = 'absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs font-mono py-1 px-2 rounded';
+                codeLabel.textContent = code;
+                
+                card.appendChild(topSlot);
+                card.appendChild(outerwearSlot);
+                card.appendChild(bottomSlot);
+                card.appendChild(shoeSlot);
+                card.appendChild(accessorySlot);
+                card.appendChild(codeLabel);
+
+                fashionShowGrid.appendChild(card);
+            }
+
+            // --- EVENT LISTENERS ---
+            randomizeBtn.addEventListener('click', randomizeOutfit);
+            clearBtn.addEventListener('click', clearOutfit);
+
+            // View toggle
+            showBuilderBtn.addEventListener('click', () => toggleView('builder'));
+            showGalleryBtn.addEventListener('click', () => toggleView('gallery'));
+
+            // Modal
+            submitOutfitBtn.addEventListener('click', openSubmitModal);
+            closeModalBtn.addEventListener('click', closeSubmitModal);
+            copyCodeBtn.addEventListener('click', copyCodeToClipboard);
+            // Close modal if clicking outside the content
+            window.addEventListener('click', (event) => {
+                if (event.target == submitModal) {
+                    closeSubmitModal();
+                }
+            });
+
+            // Gallery
+            loadShowBtn.addEventListener('click', loadFashionShow);
+
+            // --- INITIALIZATION ---
+            renderCloset();
+        });
+    </script>
+</body>
+</html>
