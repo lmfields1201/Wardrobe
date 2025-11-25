@@ -220,6 +220,12 @@
                             <label for="outfitCodes" class="block text-sm font-medium text-gray-700">Paste all outfit codes here (one per line):</label>
                             <textarea id="outfitCodes" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste codes from your group chat or Google Doc..."></textarea>
                             <p class="text-xs text-gray-500">Example: <span class="font-mono">1-2-3-0-0</span></p>
+
+                            <div class="mt-3">
+                                <label for="showNotes" class="block text-sm font-medium text-gray-700 mb-1">Show title & notes</label>
+                                <textarea id="showNotes" rows="3" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="e.g. Casey's Fall 2025 Capsule Show, theme, running order notes..."></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Saved into the shareable link so others can see your notes.</p>
+                            </div>
                         </div>
 
                         <div class="space-y-4">
@@ -282,6 +288,9 @@
                         </button>
                         <button id="stopShowBtn" class="hidden bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 text-sm">
                             Stop Show
+                        </button>
+                        <button id="copyShowLinkBtn" class="bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-75 text-sm">
+                            Copy Shareable Show Link
                         </button>
                         <span id="showStatus" class="text-xs text-gray-600"></span>
                     </div>
@@ -408,7 +417,9 @@
             const lightColor3Input = document.getElementById('lightColor3');
             const startShowBtn = document.getElementById('startShowBtn');
             const stopShowBtn = document.getElementById('stopShowBtn');
+            const copyShowLinkBtn = document.getElementById('copyShowLinkBtn');
             const showStatus = document.getElementById('showStatus');
+            const showNotesInput = document.getElementById('showNotes');
             const stageSpotlight = document.getElementById('stageSpotlight');
             const stageSlots = {
                 tops: document.getElementById('stageTop'),
@@ -423,6 +434,98 @@
             let showOrder = [];
             let showOutfits = [];
             let audioPlayer = null;
+
+            // --- URL helpers for shareable shows ---
+            function buildShowShareUrl() {
+                const baseUrl = window.location.origin + window.location.pathname;
+                const params = new URLSearchParams();
+
+                const rawCodes = outfitCodesInput.value.trim().split('\n').map(line => line.trim()).filter(Boolean);
+                if (rawCodes.length) {
+                    params.set('codes', rawCodes.join('|'));
+                }
+
+                if (outfitSequenceInput.value.trim()) {
+                    params.set('seq', outfitSequenceInput.value.trim());
+                }
+
+                if (songSelect.value && songSelect.value !== 'none') {
+                    params.set('song', songSelect.value);
+                }
+
+                if (outfitDurationInput.value) {
+                    params.set('dur', outfitDurationInput.value);
+                }
+                if (transitionDurationInput.value) {
+                    params.set('trans', transitionDurationInput.value);
+                }
+
+                params.set('c1', lightColor1Input.value || '#ff3b81');
+                params.set('c2', lightColor2Input.value || '#4f46e5');
+                params.set('c3', lightColor3Input.value || '#22c55e');
+
+                if (showNotesInput.value.trim()) {
+                    params.set('notes', showNotesInput.value.trim());
+                }
+
+                return baseUrl + '?' + params.toString();
+            }
+
+            function applyUrlShowConfig() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('codes') && !urlParams.has('notes')) {
+                    return; // Nothing special in URL
+                }
+
+                const codesParam = urlParams.get('codes');
+                if (codesParam) {
+                    const lines = codesParam.split('|');
+                    outfitCodesInput.value = lines.join('\n');
+                }
+
+                const seqParam = urlParams.get('seq');
+                if (seqParam) {
+                    outfitSequenceInput.value = seqParam;
+                }
+
+                const songParam = urlParams.get('song');
+                if (songParam) {
+                    // Validate against existing options
+                    const optionExists = Array.from(songSelect.options).some(opt => opt.value === songParam);
+                    if (optionExists) {
+                        songSelect.value = songParam;
+                    }
+                }
+
+                const durParam = urlParams.get('dur');
+                if (durParam) {
+                    outfitDurationInput.value = durParam;
+                }
+                const transParam = urlParams.get('trans');
+                if (transParam) {
+                    transitionDurationInput.value = transParam;
+                }
+
+                const c1 = urlParams.get('c1');
+                const c2 = urlParams.get('c2');
+                const c3 = urlParams.get('c3');
+                if (c1) lightColor1Input.value = c1;
+                if (c2) lightColor2Input.value = c2;
+                if (c3) lightColor3Input.value = c3;
+
+                const notes = urlParams.get('notes');
+                if (notes) {
+                    showNotesInput.value = notes;
+                }
+
+                // Sync the lights and gallery from URL
+                applySpotlightColors();
+                loadFashionShow();
+
+                if (codesParam) {
+                    showStatus.textContent = 'Loaded show from shared link.';
+                }
+            }
 
             // --- FUNCTIONS ---
 
@@ -843,9 +946,26 @@
             lightColor2Input.addEventListener('input', applySpotlightColors);
             lightColor3Input.addEventListener('input', applySpotlightColors);
 
+            copyShowLinkBtn.addEventListener('click', () => {
+                const url = buildShowShareUrl();
+                const tempInput = document.createElement('input');
+                tempInput.value = url;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                tempInput.setSelectionRange(0, 99999);
+                try {
+                    document.execCommand('copy');
+                    showStatus.textContent = 'Shareable show link copied to clipboard.';
+                } catch (e) {
+                    showStatus.textContent = 'Could not copy automatically. Please copy the URL from the address bar.';
+                }
+                document.body.removeChild(tempInput);
+            });
+
             // --- INITIALIZATION ---
             renderCloset();
             applySpotlightColors();
+            applyUrlShowConfig();
         });
     </script>
 </body>
