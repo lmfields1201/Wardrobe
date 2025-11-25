@@ -85,6 +85,44 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        /* Fashion Show Stage */
+        .stage-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .spotlight-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.8;
+            transition: background 0.6s ease;
+        }
+        .spotlight-layer::before,
+        .spotlight-layer::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 200%;
+            top: -50%;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.7;
+        }
+        .spotlight-layer::before {
+            left: -10%;
+        }
+        .spotlight-layer::after {
+            right: -10%;
+        }
+        .stage-spotlight-active {
+            animation: stagePulse 4s ease-in-out infinite;
+        }
+        @keyframes stagePulse {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
 
         /* View Toggle Styles */
         .view-toggle button {
@@ -172,17 +210,102 @@
 
             <!-- View 2: The Fashion Show Gallery -->
             <div id="gallery-view" class="hidden">
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 class="text-3xl font-semibold mb-4 text-center">Fashion Show Gallery</h2>
-                    <div class="max-w-2xl mx-auto text-center">
-                        <label for="outfitCodes" class="block text-md font-medium text-gray-700 mb-2">Paste all outfit codes here (one per line):</label>
-                        <textarea id="outfitCodes" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste codes from your group chat or Google Doc..."></textarea>
-                        <button id="loadShowBtn" class="mt-4 w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
-                            Load Fashion Show
-                        </button>
+                <div class="bg-white p-6 rounded-2xl shadow-lg space-y-6">
+                    <h2 class="text-3xl font-semibold text-center">Fashion Show</h2>
+
+                    <!-- Show Configuration -->
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Outfit Codes</h3>
+                            <label for="outfitCodes" class="block text-sm font-medium text-gray-700">Paste all outfit codes here (one per line):</label>
+                            <textarea id="outfitCodes" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste codes from your group chat or Google Doc..."></textarea>
+                            <p class="text-xs text-gray-500">Example: <span class="font-mono">1-2-3-0-0</span></p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-semibold text-gray-800">Show Settings</h3>
+
+                            <div>
+                                <label for="outfitSequence" class="block text-sm font-medium text-gray-700 mb-1">Outfit sequence order</label>
+                                <input id="outfitSequence" type="text" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="e.g. 1,2,3,2,4 (line numbers)" />
+                                <p class="text-xs text-gray-500 mt-1">Leave blank to use the outfits in order.</p>
+                            </div>
+
+                            <div>
+                                <label for="songSelect" class="block text-sm font-medium text-gray-700 mb-1">Soundtrack</label>
+                                <select id="songSelect" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    <option value="none">No music</option>
+                                    <option value="https://cdn.pixabay.com/download/audio/2022/10/03/audio_4b13f4dd1c.mp3?filename=fashion-show-122053.mp3">Fashion Show Groove</option>
+                                    <option value="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8a23a4adc8.mp3?filename=future-bass-beat-21946.mp3">Future Bass Beat</option>
+                                    <option value="https://cdn.pixabay.com/download/audio/2021/11/22/audio_7a0c2416cc.mp3?filename=lounge-112191.mp3">Lounge Walk</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="outfitDuration" class="block text-sm font-medium text-gray-700 mb-1">Seconds per outfit</label>
+                                    <input id="outfitDuration" type="number" min="1" step="0.5" value="4" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+                                </div>
+                                <div>
+                                    <label for="transitionDuration" class="block text-sm font-medium text-gray-700 mb-1">Transition seconds</label>
+                                    <input id="transitionDuration" type="number" min="0" step="0.25" value="1" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="block text-sm font-medium text-gray-700 mb-1">Spotlight colors</p>
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <div class="flex items-center gap-1 text-xs text-gray-600">
+                                        <span class="w-4 inline-block">A</span>
+                                        <input id="lightColor1" type="color" value="#ff3b81" class="w-10 h-7 border border-gray-300 rounded" />
+                                    </div>
+                                    <div class="flex items-center gap-1 text-xs text-gray-600">
+                                        <span class="w-4 inline-block">B</span>
+                                        <input id="lightColor2" type="color" value="#4f46e5" class="w-10 h-7 border border-gray-300 rounded" />
+                                    </div>
+                                    <div class="flex items-center gap-1 text-xs text-gray-600">
+                                        <span class="w-4 inline-block">C</span>
+                                        <input id="lightColor3" type="color" value="#22c55e" class="w-10 h-7 border border-gray-300 rounded" />
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">These colors tint the stage lighting.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="border-t border-gray-200 mt-8 pt-6">
+                    <div class="flex flex-wrap gap-3 items-center justify-center border-t border-gray-200 pt-4">
+                        <button id="loadShowBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-sm">
+                            Load / Refresh Gallery
+                        </button>
+                        <button id="startShowBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 text-sm">
+                            Start Fashion Show
+                        </button>
+                        <button id="stopShowBtn" class="hidden bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 text-sm">
+                            Stop Show
+                        </button>
+                        <span id="showStatus" class="text-xs text-gray-600"></span>
+                    </div>
+
+                    <!-- Stage Preview -->
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2 text-center">Runway Stage</h3>
+                        <div class="stage-wrapper bg-gray-900 p-4 md:p-6">
+                            <div class="relative max-w-md mx-auto h-72 md:h-80 bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
+                                <div id="stageSpotlight" class="spotlight-layer"></div>
+                                <div id="stageOutfit" class="relative gallery-card w-64 h-60 bg-gray-200 rounded-lg overflow-hidden shadow-xl">
+                                    <div id="stageTop" class="gallery-slot absolute top-0 left-0 w-full h-1/2"></div>
+                                    <div id="stageOuterwear" class="gallery-slot absolute top-0 left-0 w-full h-1/2"></div>
+                                    <div id="stageBottom" class="gallery-slot absolute bottom-[25%] left-0 w-full h-1/2"></div>
+                                    <div id="stageShoes" class="gallery-slot absolute bottom-0 left-0 w-full h-1/4"></div>
+                                    <div id="stageAccessory" class="gallery-slot absolute top-[-5%] left-0 w-full h-1/4"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Static Gallery Grid -->
+                    <div class="border-t border-gray-200 mt-6 pt-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Gallery Grid</h3>
                         <div id="fashion-show-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             <!-- Outfits will be rendered here -->
                         </div>
@@ -274,6 +397,32 @@
             const outfitCodesInput = document.getElementById('outfitCodes');
             const loadShowBtn = document.getElementById('loadShowBtn');
             const fashionShowGrid = document.getElementById('fashion-show-grid');
+
+            // Fashion show controls
+            const outfitSequenceInput = document.getElementById('outfitSequence');
+            const songSelect = document.getElementById('songSelect');
+            const outfitDurationInput = document.getElementById('outfitDuration');
+            const transitionDurationInput = document.getElementById('transitionDuration');
+            const lightColor1Input = document.getElementById('lightColor1');
+            const lightColor2Input = document.getElementById('lightColor2');
+            const lightColor3Input = document.getElementById('lightColor3');
+            const startShowBtn = document.getElementById('startShowBtn');
+            const stopShowBtn = document.getElementById('stopShowBtn');
+            const showStatus = document.getElementById('showStatus');
+            const stageSpotlight = document.getElementById('stageSpotlight');
+            const stageSlots = {
+                tops: document.getElementById('stageTop'),
+                outerwear: document.getElementById('stageOuterwear'),
+                bottoms: document.getElementById('stageBottom'),
+                shoes: document.getElementById('stageShoes'),
+                accessories: document.getElementById('stageAccessory')
+            };
+
+            let showTimer = null;
+            let currentShowIndex = 0;
+            let showOrder = [];
+            let showOutfits = [];
+            let audioPlayer = null;
 
             // --- FUNCTIONS ---
 
@@ -481,25 +630,32 @@
 
             // --- NEW: Gallery Functions ---
             function loadFashionShow() {
-                const codes = outfitCodesInput.value.trim().split('\n');
-                fashionShowGrid.innerHTML = ''; // Clear previous gallery
+                const lines = outfitCodesInput.value.trim().split('\n');
+                fashionShowGrid.innerHTML = '';
+                showOutfits = [];
 
-                codes.forEach(code => {
-                    if (!code) return; // Skip empty lines
+                lines.forEach((code, index) => {
+                    const trimmed = code.trim();
+                    if (!trimmed) return;
 
-                    const ids = code.split('-');
-                    if (ids.length !== 5) return; // Skip invalid codes
+                    const ids = trimmed.split('-');
+                    if (ids.length !== 5) return;
 
                     const outfit = {
                         tops: closetData.tops.find(item => item.id === parseInt(ids[0])),
                         bottoms: closetData.bottoms.find(item => item.id === parseInt(ids[1])),
                         shoes: closetData.shoes.find(item => item.id === parseInt(ids[2])),
                         accessories: closetData.accessories.find(item => item.id === parseInt(ids[3])),
-                        outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4]))
+                        outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4])),
+                        code: trimmed,
+                        lineNumber: index + 1
                     };
 
-                    renderOutfitCard(outfit, code);
+                    showOutfits.push(outfit);
+                    renderOutfitCard(outfit, trimmed);
                 });
+
+                showStatus.textContent = showOutfits.length ? `Loaded ${showOutfits.length} outfits.` : 'No valid outfit codes found.';
             }
 
             function renderOutfitCard(outfit, code) {
@@ -521,7 +677,7 @@
                 
                 const shoeSlot = document.createElement('div');
                 shoeSlot.className = 'gallery-slot absolute bottom-0 left-0 w-full h-1/4';
-                if (outfit.shoes) shoeSlot.style.backgroundImage = `url(${outfitt.shoes.imageUrl})`;
+                if (outfit.shoes) shoeSlot.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
 
                 const accessorySlot = document.createElement('div');
                 accessorySlot.className = 'gallery-slot absolute top-[-5%] left-0 w-full h-1/4';
@@ -540,6 +696,123 @@
                 card.appendChild(codeLabel);
 
                 fashionShowGrid.appendChild(card);
+            }
+
+            // --- Fashion Show Playback ---
+            function applySpotlightColors() {
+                const c1 = lightColor1Input.value;
+                const c2 = lightColor2Input.value;
+                const c3 = lightColor3Input.value;
+
+                stageSpotlight.style.background = `radial-gradient(circle at 20% 0%, ${c1}, transparent 60%),
+                    radial-gradient(circle at 80% 0%, ${c2}, transparent 60%),
+                    radial-gradient(circle at 50% 80%, ${c3}, transparent 70%)`;
+
+                stageSpotlight.style.setProperty('--c1', c1);
+                stageSpotlight.style.setProperty('--c2', c2);
+                stageSpotlight.style.setProperty('--c3', c3);
+                stageSpotlight.classList.add('stage-spotlight-active');
+            }
+
+            function clearStage() {
+                Object.values(stageSlots).forEach(slot => {
+                    slot.style.backgroundImage = 'none';
+                });
+            }
+
+            function showOutfitOnStage(outfit) {
+                clearStage();
+                if (!outfit) return;
+
+                if (outfit.tops) stageSlots.tops.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+                if (outfit.outerwear) stageSlots.outerwear.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
+                if (outfit.bottoms) stageSlots.bottoms.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+                if (outfit.shoes) stageSlots.shoes.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
+                if (outfit.accessories) stageSlots.accessories.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
+            }
+
+            function parseSequence() {
+                if (!outfitSequenceInput.value.trim()) {
+                    return showOutiftsIndicesDefault();
+                }
+
+                const parts = outfitSequenceInput.value.split(',');
+                const indices = [];
+                parts.forEach(p => {
+                    const n = parseInt(p.trim(), 10);
+                    if (!Number.isNaN(n) && n >= 1 && n <= showOutfits.length) {
+                        indices.push(n - 1);
+                    }
+                });
+                return indices.length ? indices : showOutiftsIndicesDefault();
+            }
+
+            function showOutiftsIndicesDefault() {
+                return showOutfits.map((_, idx) => idx);
+            }
+
+            function startFashionShow() {
+                if (!showOutfits.length) {
+                    loadFashionShow();
+                    if (!showOutfits.length) return;
+                }
+
+                showOrder = parseSequence();
+                if (!showOrder.length) return;
+
+                const outfitSeconds = Math.max(0.5, parseFloat(outfitDurationInput.value) || 4);
+                const transitionSeconds = Math.max(0, parseFloat(transitionDurationInput.value) || 1);
+                const totalSeconds = outfitSeconds + transitionSeconds;
+
+                applySpotlightColors();
+                currentShowIndex = 0;
+                playCurrentOutfit();
+
+                if (showTimer) clearInterval(showTimer);
+                showTimer = setInterval(() => {
+                    currentShowIndex = (currentShowIndex + 1) % showOrder.length;
+                    playCurrentOutfit();
+                }, totalSeconds * 1000);
+
+                // Music
+                const songUrl = songSelect.value;
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer = null;
+                }
+                if (songUrl && songUrl !== 'none') {
+                    audioPlayer = new Audio(songUrl);
+                    audioPlayer.loop = true;
+                    audioPlayer.play().catch(() => {
+                        showStatus.textContent = 'Tap anywhere to allow audio playback.';
+                    });
+                }
+
+                startShowBtn.classList.add('hidden');
+                stopShowBtn.classList.remove('hidden');
+                showStatus.textContent = `Playing ${showOrder.length} outfits • ${outfitSeconds}s each (+${transitionSeconds}s).`;
+            }
+
+            function playCurrentOutfit() {
+                const index = showOrder[currentShowIndex];
+                const outfit = showOutfits[index];
+                showOutfitOnStage(outfit);
+            }
+
+            function stopFashionShow() {
+                if (showTimer) {
+                    clearInterval(showTimer);
+                    showTimer = null;
+                }
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer = null;
+                }
+                clearStage();
+                stageSpotlight.classList.remove('stage-spotlight-active');
+                startShowBtn.classList.remove('hidden');
+                stopShowBtn.classList.add('hidden');
+                showStatus.textContent = 'Show stopped.';
             }
 
             // --- EVENT LISTENERS ---
@@ -563,9 +836,16 @@
 
             // Gallery
             loadShowBtn.addEventListener('click', loadFashionShow);
+            startShowBtn.addEventListener('click', startFashionShow);
+            stopShowBtn.addEventListener('click', stopFashionShow);
+
+            lightColor1Input.addEventListener('input', applySpotlightColors);
+            lightColor2Input.addEventListener('input', applySpotlightColors);
+            lightColor3Input.addEventListener('input', applySpotlightColors);
 
             // --- INITIALIZATION ---
             renderCloset();
+            applySpotlightColors();
         });
     </script>
 </body>
