@@ -85,43 +85,23 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        /* Outfit layer positioning - proper z-index stacking */
+        .gallery-slot.slot-shoes { z-index: 1; }
+        .gallery-slot.slot-bottoms { z-index: 2; }
+        .gallery-slot.slot-tops { z-index: 3; }
+        .gallery-slot.slot-outerwear { z-index: 4; opacity: 0.9; }
+        .gallery-slot.slot-accessories { z-index: 5; }
+        
+        .mannequin-slot.slot-shoes { z-index: 1; }
+        .mannequin-slot.slot-bottoms { z-index: 2; }
+        .mannequin-slot.slot-tops { z-index: 3; }
+        .mannequin-slot.slot-outerwear { z-index: 4; opacity: 0.9; }
+        .mannequin-slot.slot-accessories { z-index: 5; }
         /* Fashion Show Stage */
         .stage-wrapper {
             position: relative;
             overflow: hidden;
             border-radius: 1rem;
-        }
-        .spotlight-layer {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            mix-blend-mode: screen;
-            opacity: 0.8;
-            transition: background 0.6s ease;
-        }
-        .spotlight-layer::before,
-        .spotlight-layer::after {
-            content: '';
-            position: absolute;
-            width: 60%;
-            height: 200%;
-            top: -50%;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.7;
-        }
-        .spotlight-layer::before {
-            left: -10%;
-        }
-        .spotlight-layer::after {
-            right: -10%;
-        }
-        .stage-spotlight-active {
-            animation: stagePulse 4s ease-in-out infinite;
-        }
-        @keyframes stagePulse {
-            0%, 100% { transform: scale(1); opacity: 0.85; }
-            50% { transform: scale(1.05); opacity: 1; }
         }
 
         /* View Toggle Styles */
@@ -135,6 +115,462 @@
         .view-toggle button.inactive {
             background-color: #e5e7eb;
             color: #4b5563;
+        }
+
+        /* Confetti Animation */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Enhanced Animated Spotlights */
+        .spotlight-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .spotlight-beam {
+            position: absolute;
+            width: 120px;
+            height: 300%;
+            top: -100%;
+            filter: blur(30px);
+            opacity: 0.7;
+            transform-origin: top center;
+            mix-blend-mode: screen;
+        }
+        .spotlight-beam.beam-1 {
+            left: 10%;
+            animation: beam-sway-1 4s ease-in-out infinite;
+        }
+        .spotlight-beam.beam-2 {
+            left: 45%;
+            animation: beam-sway-2 5s ease-in-out infinite;
+        }
+        .spotlight-beam.beam-3 {
+            right: 10%;
+            animation: beam-sway-3 4.5s ease-in-out infinite;
+        }
+        @keyframes beam-sway-1 {
+            0%, 100% { transform: rotate(-15deg) translateX(0); opacity: 0.7; }
+            50% { transform: rotate(15deg) translateX(20px); opacity: 0.9; }
+        }
+        @keyframes beam-sway-2 {
+            0%, 100% { transform: rotate(10deg) translateX(0); opacity: 0.6; }
+            33% { transform: rotate(-8deg) translateX(-15px); opacity: 0.8; }
+            66% { transform: rotate(5deg) translateX(10px); opacity: 0.7; }
+        }
+        @keyframes beam-sway-3 {
+            0%, 100% { transform: rotate(20deg) translateX(0); opacity: 0.7; }
+            50% { transform: rotate(-20deg) translateX(-25px); opacity: 0.85; }
+        }
+        /* Ambient glow layer */
+        .spotlight-ambient {
+            position: absolute;
+            inset: 0;
+            opacity: 0.4;
+            pointer-events: none;
+            transition: background 0.8s ease;
+        }
+        .spotlight-sweep {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+            animation: sweep 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes sweep {
+            0%, 100% { transform: translateX(-100%); opacity: 0; }
+            50% { transform: translateX(100%); opacity: 1; }
+            50% { transform: translateX(100%); }
+        }
+
+        /* Transition Effects */
+        .stage-outfit {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .stage-outfit.fade-out {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .stage-outfit.fade-in {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .stage-outfit.slide-out {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        .stage-outfit.slide-in {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Visual Timeline */
+        .timeline-container {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            overflow-x: auto;
+            min-height: 80px;
+            align-items: center;
+        }
+        .timeline-item {
+            flex-shrink: 0;
+            width: 60px;
+            height: 70px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            cursor: grab;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .timeline-item:hover {
+            border-color: #4f46e5;
+            transform: scale(1.05);
+        }
+        .timeline-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .timeline-item.playing {
+            border-color: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+        .timeline-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .timeline-item:hover .remove-btn {
+            opacity: 1;
+        }
+        .timeline-item .order-num {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        .timeline-dropzone {
+            width: 40px;
+            height: 70px;
+            border: 2px dashed #9ca3af;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 20px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .timeline-dropzone:hover, .timeline-dropzone.drag-over {
+            border-color: #4f46e5;
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        /* Recent Outfits */
+        .recent-outfit {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #e5e7eb;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .recent-outfit:hover {
+            background: #d1d5db;
+        }
+
+        /* Saved Shows */
+        .saved-show-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+        .saved-show-item:hover {
+            background: #f3f4f6;
+        }
+
+        /* Progress Bar */
+        .show-progress {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .show-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #22c55e);
+            transition: width 0.3s ease;
+        }
+
+        /* Large Show Code Display */
+        .show-code-display {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 0.15em;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            word-break: break-all;
+            user-select: all;
+            cursor: pointer;
+        }
+        .show-code-display:hover {
+            background: linear-gradient(135deg, #4338ca, #6d28d9);
+        }
+
+        /* Collect Mode */
+        .collect-mode {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        /* Fullscreen Stage */
+        .stage-wrapper {
+            position: relative;
+        }
+        .fullscreen-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 20;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1rem;
+        }
+        .fullscreen-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .stage-wrapper {
+            position: relative;
+        }
+        .stage-wrapper.fullscreen-mode {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #111827;
+        }
+        .stage-wrapper.fullscreen-mode .fullscreen-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10000;
+        }
+        .stage-wrapper.fullscreen-mode #stageCounter {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10000;
+            font-size: 1.25rem;
+            padding: 0.5rem 1rem;
+        }
+        /* The inner stage container */
+        .stage-wrapper.fullscreen-mode .stage-inner {
+            width: 95vw;
+            max-width: 1200px;
+            height: auto;
+            max-height: 90vh;
+        }
+        /* The outfit display area in fullscreen */
+        .stage-wrapper.fullscreen-mode .stage-outfit-row {
+            gap: 2.5rem;
+        }
+        /* The outfit card itself */
+        .stage-wrapper.fullscreen-mode .stage-outfit {
+            width: 380px !important;
+            height: 440px !important;
+        }
+        /* The side slots for outerwear/accessories in fullscreen */
+        .stage-wrapper.fullscreen-mode .stage-side-slot {
+            width: 150px !important;
+            height: 200px !important;
+        }
+        .stage-wrapper.fullscreen-mode #stageOutfitName {
+            font-size: 1.6rem;
+            max-width: 640px;
+            padding: 0.6rem 1.8rem;
+        }
+        /* Keep accessories/outerwear vivid in fullscreen */
+        .stage-wrapper.fullscreen-mode .stage-side-slot {
+            background-color: transparent !important;
+            opacity: 1 !important;
+            filter: none;
+        }
+        .designer-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 2px solid #4f46e5;
+            border-radius: 20px;
+            font-weight: 500;
+            margin: 4px;
+        }
+        .designer-chip .count {
+            background: #4f46e5;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .designer-chip .remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .designer-attribution {
+            background: rgba(79, 70, 229, 0.9);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 2px;
+        }
+
+        /* Designer outfit preview thumbnails */
+        .designer-outfit-thumb {
+            position: relative;
+            width: 48px;
+            height: 56px;
+            background: white;
+            border: 2px solid #a78bfa;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .designer-outfit-thumb .outfit-num {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            background: rgba(79, 70, 229, 0.9);
+            color: white;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .designer-outfit-thumb .remove-outfit {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 14px;
+            height: 14px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .designer-outfit-thumb:hover .remove-outfit {
+            opacity: 1;
+        }
+
+        /* Stage side slots for outerwear and accessories */
+        .stage-side-slot {
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: opacity 0.3s;
+        }
+        .stage-side-slot:empty {
+            opacity: 0.3;
+        }
+
+        /* Gallery sequence badge */
+        .gallery-seq-badge {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: #4f46e5;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .gallery-card.in-sequence {
+            border: 3px solid #4f46e5;
+        }
+        .gallery-card:hover {
+            transform: scale(1.02);
+            transition: transform 0.15s;
         }
 
     </style>
@@ -164,10 +600,10 @@
                     <div id="mannequin" class="relative w-full max-w-sm mx-auto h-[400px] md:h-[500px] bg-gray-200 rounded-lg flex flex-col items-center justify-center overflow-hidden">
                         <!-- This container will hold all the clothing slots -->
                         <div class="absolute inset-0">
-                            <div id="mannequin-tops" class="mannequin-slot absolute top-0 left-0 w-full h-1/2"></div>
+                            <div id="mannequin-tops" class="mannequin-slot slot-tops absolute top-[8%] left-0 w-full h-[45%]"></div>
                             <!-- <div id="mannequin-outerwear" ...> MOVED -->
-                            <div id="mannequin-bottoms" class="mannequin-slot absolute bottom-[25%] left-0 w-full h-1/2"></div>
-                            <div id="mannequin-shoes" class="mannequin-slot absolute bottom-0 left-0 w-full h-1/4"></div>
+                            <div id="mannequin-bottoms" class="mannequin-slot slot-bottoms absolute top-[40%] left-0 w-full h-[45%]"></div>
+                            <div id="mannequin-shoes" class="mannequin-slot slot-shoes absolute bottom-[2%] left-0 w-full h-[22%]"></div>
                             <!-- <div id="mannequin-accessories" ...> MOVED -->
                         </div>
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-32 h-32 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 1 0 5 5a5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3a3 3 0 0 1-3 3zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z"/></svg>
@@ -194,9 +630,7 @@
                         <button id="randomizeBtn" class="w-1/3 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-colors">Random</button>
                         <button id="clearBtn" class="w-1/3 bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 transition-colors">Clear</button>
                     </div>
-                     <button id="submitOutfitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors mt-4">
-                        Submit Outfit to Show
-                    </button>
+                     <button id="submitOutfitBtn" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors mt-4\">\n                        ✨ Submit Outfit\n                    </button>\n                    <p id=\"submitFeedback\" class=\"text-center text-sm text-green-600 mt-2 h-5\"></p>
                 </div>
 
                 <!-- Right Side: Closet/Wardrobe -->
@@ -213,13 +647,91 @@
                 <div class="bg-white p-6 rounded-2xl shadow-lg space-y-6">
                     <h2 class="text-3xl font-semibold text-center">Fashion Show</h2>
 
+                    <!-- Multi-Designer Mode -->
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <!-- Get Your Show Code -->
+                        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-xl p-4">
+                            <h3 class="text-lg font-semibold text-purple-800 mb-2">🎨 Generate Your Show Code</h3>
+                            <p class="text-xs text-purple-600 mb-2">Your code will include all outfits from the gallery below</p>
+                            
+                            <!-- Visual preview of gallery outfits -->
+                            <div id="designerOutfitPreview" class="flex flex-wrap gap-2 mb-3 min-h-[48px] bg-white bg-opacity-50 rounded-lg p-2">
+                                <p class="text-xs text-purple-400 italic w-full text-center py-2">Load outfits into the gallery first</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <input type="text" id="designerNameInput" placeholder="Your name (e.g., Casey)" maxlength="12" class="w-full p-2 border border-purple-300 rounded-lg text-center font-medium text-sm" />
+                                <div class="flex items-center justify-center gap-2">
+                                    <span class="text-xs text-purple-600">Stage lighting:</span>
+                                    <input id="designerColor1" type="color" value="#ff3b81" class="w-6 h-6 border border-purple-300 rounded cursor-pointer" title="Light A" />
+                                    <input id="designerColor2" type="color" value="#4f46e5" class="w-6 h-6 border border-purple-300 rounded cursor-pointer" title="Light B" />
+                                    <input id="designerColor3" type="color" value="#22c55e" class="w-6 h-6 border border-purple-300 rounded cursor-pointer" title="Light C" />
+                                </div>
+                                <button id="getShowCodeBtn" class="w-full bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    📋 Get My Show Code
+                                </button>
+                                <p id="designerOutfitCount" class="text-purple-600 font-medium text-xs text-center">0 outfits in gallery</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Collect Designer Codes (Facilitator) -->
+                        <div class="collect-mode">
+                            <h3 class="text-lg font-semibold text-amber-800 mb-2">🎭 Collect Designer Codes</h3>
+                            <p class="text-xs text-amber-700 mb-3">Facilitator: Enter each designer's code to build a combined show</p>
+                            
+                            <div class="flex gap-2 mb-3">
+                                <input id="designerCodeInput" type="text" placeholder="Enter code (e.g., CASEY-012310-FF3B81...)" class="flex-1 p-2 border-2 border-amber-400 rounded-lg text-center font-mono uppercase bg-white text-sm" />
+                                <button id="addDesignerBtn" class="bg-amber-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors text-sm">
+                                    Add
+                                </button>
+                            </div>
+                            
+                            <div id="collectedDesigners" class="mb-3 min-h-[32px]">
+                                <p class="text-xs text-amber-600 italic">No designers added yet</p>
+                            </div>
+                            
+                            <div class="flex gap-2 flex-wrap">
+                                <button id="buildCombinedShowBtn" class="bg-green-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-green-700 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    🎬 Build Combined Show
+                                </button>
+                                <button id="clearCollectionBtn" class="bg-gray-400 text-white font-semibold py-2 px-3 rounded-lg hover:bg-gray-500 transition-colors text-xs">
+                                    Clear
+                                </button>
+                                <span id="collectionStats" class="text-xs text-amber-700 self-center"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saved Shows & Recent Outfits -->
+                    <div class="grid gap-4 md:grid-cols-2 border-b border-gray-200 pb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Saved Shows</h3>
+                            <div class="flex gap-2 mb-2">
+                                <input id="saveShowName" type="text" placeholder="Name this show..." class="flex-1 p-2 border border-gray-300 rounded-lg text-sm" />
+                                <button id="saveShowBtn" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-indigo-700">Save</button>
+                            </div>
+                            <div id="savedShowsList" class="max-h-32 overflow-y-auto space-y-1">
+                                <p class="text-xs text-gray-500 italic">No saved shows yet.</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">Recent Outfits</h3>
+                            <div id="recentOutfitsList" class="flex flex-wrap gap-2">
+                                <p class="text-xs text-gray-500 italic">Submit outfits to see them here.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Show Configuration -->
                     <div class="grid gap-6 md:grid-cols-2">
                         <div class="space-y-4">
-                            <h3 class="text-xl font-semibold text-gray-800">Outfit Codes</h3>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-semibold text-gray-800">Outfit Codes</h3>
+                                <button id="clearCodesBtn" class="text-xs text-red-500 hover:text-red-700">Clear All</button>
+                            </div>
                             <label for="outfitCodes" class="block text-sm font-medium text-gray-700">Paste all outfit codes here (one per line):</label>
                             <textarea id="outfitCodes" rows="6" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste codes from your group chat or Google Doc..."></textarea>
-                            <p class="text-xs text-gray-500">Example: <span class="font-mono">1-2-3-0-0</span></p>
+                            <p class="text-xs text-gray-500">Example: <span class="font-mono">1-2-3-0-0</span> or <span class="font-mono">My Look:1-2-3-0-0</span></p>
 
                             <div class="mt-3">
                                 <label for="showNotes" class="block text-sm font-medium text-gray-700 mb-1">Show title & notes</label>
@@ -232,9 +744,12 @@
                             <h3 class="text-xl font-semibold text-gray-800">Show Settings</h3>
 
                             <div>
-                                <label for="outfitSequence" class="block text-sm font-medium text-gray-700 mb-1">Outfit sequence order</label>
-                                <input id="outfitSequence" type="text" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="e.g. 1,2,3,2,4 (line numbers)" />
-                                <p class="text-xs text-gray-500 mt-1">Leave blank to use the outfits in order.</p>
+                                <label for="transitionType" class="block text-sm font-medium text-gray-700 mb-1">Transition effect</label>
+                                <select id="transitionType" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    <option value="fade">Fade</option>
+                                    <option value="slide">Slide</option>
+                                    <option value="none">None (instant)</option>
+                                </select>
                             </div>
 
                             <div>
@@ -279,45 +794,102 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-3 items-center justify-center border-t border-gray-200 pt-4">
+                    <!-- Show Progress -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <div class="show-progress">
+                            <div id="showProgressBar" class="show-progress-bar" style="width: 0%"></div>
+                        </div>
+                        <p id="showProgressText" class="text-xs text-gray-500 mt-1 text-center"></p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 items-center justify-center pt-4">
                         <button id="loadShowBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75 text-sm">
                             Load / Refresh Gallery
                         </button>
                         <button id="startShowBtn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 text-sm">
-                            Start Fashion Show
+                            ▶ Start Show
                         </button>
                         <button id="stopShowBtn" class="hidden bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 text-sm">
-                            Stop Show
+                            ■ Stop
                         </button>
-                        <button id="copyShowLinkBtn" class="bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-75 text-sm">
-                            Copy Shareable Show Link
-                        </button>
+                        <div id="manualNavControls" class="hidden flex items-center gap-2">
+                            <button id="prevOutfitBtn" class="bg-gray-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-gray-700 text-sm">◀ Prev</button>
+                            <button id="pauseShowBtn" class="bg-yellow-500 text-white font-semibold py-2 px-3 rounded-lg hover:bg-yellow-600 text-sm">⏸ Pause</button>
+                            <button id="nextOutfitBtn" class="bg-gray-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-gray-700 text-sm">Next ▶</button>
+                        </div>
                         <span id="showStatus" class="text-xs text-gray-600"></span>
+                    </div>
+
+                    <!-- Export/Import -->
+                    <div class="flex flex-wrap gap-3 items-center justify-center">
+                        <button id="copyShowLinkBtn" class="bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-75 text-sm">
+                            📋 Copy Share Link
+                        </button>
+                        <button id="exportShowBtn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 text-sm">
+                            💾 Export JSON
+                        </button>
+                        <label class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-purple-700 text-sm cursor-pointer">
+                            📁 Import JSON
+                            <input type="file" id="importShowInput" accept=".json" class="hidden" />
+                        </label>
                     </div>
 
                     <!-- Stage Preview -->
                     <div class="mt-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2 text-center">Runway Stage</h3>
-                        <div class="stage-wrapper bg-gray-900 p-4 md:p-6">
-                            <div class="relative max-w-md mx-auto h-72 md:h-80 bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
-                                <div id="stageSpotlight" class="spotlight-layer"></div>
-                                <div id="stageOutfit" class="relative gallery-card w-64 h-60 bg-gray-200 rounded-lg overflow-hidden shadow-xl">
-                                    <div id="stageTop" class="gallery-slot absolute top-0 left-0 w-full h-1/2"></div>
-                                    <div id="stageOuterwear" class="gallery-slot absolute top-0 left-0 w-full h-1/2"></div>
-                                    <div id="stageBottom" class="gallery-slot absolute bottom-[25%] left-0 w-full h-1/2"></div>
-                                    <div id="stageShoes" class="gallery-slot absolute bottom-0 left-0 w-full h-1/4"></div>
-                                    <div id="stageAccessory" class="gallery-slot absolute top-[-5%] left-0 w-full h-1/4"></div>
+                        <div id="stageWrapper" class="stage-wrapper bg-gray-900 p-4 md:p-6">
+                            <button id="fullscreenBtn" class="fullscreen-btn" title="Toggle Fullscreen">⛶ Fullscreen</button>
+                            <div id="stageCounter" class="absolute top-2 left-2 z-20 bg-black bg-opacity-70 text-white text-sm font-bold px-3 py-1 rounded hidden"></div>
+                            <div class="stage-inner relative max-w-md mx-auto h-72 md:h-80 bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 rounded-xl shadow-2xl overflow-hidden flex items-center justify-center">
+                                <div id="stageSpotlight" class="spotlight-layer">
+                                    <div class="spotlight-ambient" id="spotlightAmbient"></div>
+                                    <div class="spotlight-beam beam-1" id="spotlightBeam1"></div>
+                                    <div class="spotlight-beam beam-2" id="spotlightBeam2"></div>
+                                    <div class="spotlight-beam beam-3" id="spotlightBeam3"></div>
+                                </div>
+                                <div class="spotlight-sweep"></div>
+                                <div class="stage-outfit-row flex items-start justify-center gap-3">
+                                    <!-- Outerwear on the left -->
+                                    <div id="stageOuterwear" class="stage-side-slot w-20 h-28 bg-gray-700 bg-opacity-50 rounded-lg overflow-hidden"></div>
+                                    
+                                    <!-- Main outfit in center -->
+                                    <div class="flex flex-col items-center">
+                                        <div id="stageOutfit" class="stage-outfit relative gallery-card w-48 h-52 bg-gray-200 rounded-lg overflow-hidden shadow-xl">
+                                            <div id="stageTop" class="gallery-slot slot-tops absolute top-[8%] left-0 w-full h-[45%]"></div>
+                                            <div id="stageBottom" class="gallery-slot slot-bottoms absolute top-[40%] left-0 w-full h-[45%]"></div>
+                                            <div id="stageShoes" class="gallery-slot slot-shoes absolute bottom-[2%] left-0 w-full h-[22%]"></div>
+                                        </div>
+                                        <div id="stageOutfitName" class="mt-2 bg-black bg-opacity-70 text-white text-sm py-1 px-4 rounded text-center truncate max-w-64 hidden"></div>
+                                    </div>
+                                    
+                                    <!-- Accessory on the right -->
+                                    <div id="stageAccessory" class="stage-side-slot w-20 h-28 bg-gray-700 bg-opacity-50 rounded-lg overflow-hidden"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Static Gallery Grid -->
+                    <!-- Gallery Grid -->
                     <div class="border-t border-gray-200 mt-6 pt-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Gallery Grid</h3>
-                        <div id="fashion-show-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            <!-- Outfits will be rendered here -->
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">Outfit Gallery <span class="text-xs text-gray-500 font-normal">(click to add/remove from show)</span></h3>
+                            <div class="flex items-center gap-3">
+                                <button id="shuffleSequenceBtn" class="text-xs text-indigo-600 hover:text-indigo-800" title="Randomize order">🔀 Shuffle</button>
+                                <button id="clearSequenceBtn" class="text-xs text-red-500 hover:text-red-700">Clear Sequence</button>
+                            </div>
                         </div>
+                        <div id="fashion-show-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 min-h-[100px]">
+                            <div id="emptyGalleryPlaceholder" class="col-span-full flex flex-col items-center justify-center py-8 text-gray-400">
+                                <span class="text-4xl mb-2">👗</span>
+                                <p class="text-sm">No outfits loaded yet</p>
+                                <p class="text-xs">Paste outfit codes above and click "Load / Refresh Gallery"</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Keyboard Shortcuts Help -->
+                    <div class="text-center text-xs text-gray-400 mt-4 border-t border-gray-100 pt-4">
+                        <p>⌨️ Keyboard shortcuts: <span class="font-mono bg-gray-100 px-1 rounded">Space</span> pause/resume • <span class="font-mono bg-gray-100 px-1 rounded">←</span> <span class="font-mono bg-gray-100 px-1 rounded">→</span> prev/next • <span class="font-mono bg-gray-100 px-1 rounded">Esc</span> exit fullscreen</p>
                     </div>
                 </div>
             </div>
@@ -328,25 +900,68 @@
     <div id="submitModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span id="closeModalBtn" class="modal-close">&times;</span>
-            <h3 class="text-2xl font-semibold mb-4">Submit Your Outfit!</h3>
-            <p class="text-gray-600 mb-4">Your outfit is ready! Copy the code below and paste it into your shared group chat, email, or document to add it to the fashion show.</p>
+            <h3 class="text-2xl font-semibold mb-4">🎉 Submit Your Outfit!</h3>
+            <p class="text-gray-600 mb-4">Your outfit is ready! Give it a name and copy the code to share.</p>
+            
+            <div class="mb-4">
+                <label for="outfitNameInput" class="block text-sm font-medium text-gray-700 mb-1">Outfit Name (optional)</label>
+                <input type="text" id="outfitNameInput" placeholder="e.g. Casual Friday, Date Night..." class="w-full border border-gray-300 p-2 rounded-lg text-sm" />
+            </div>
+            
             <div class="relative">
-                <input type="text" id="outfitCodeOutput" readonly class="w-full bg-gray-100 border border-gray-300 text-gray-700 p-3 rounded-lg pr-24" />
-                <button id="copyCodeBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700">Copy</button>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Outfit Code</label>
+                <input type="text" id="outfitCodeOutput" readonly class="w-full bg-gray-100 border border-gray-300 text-gray-700 p-3 rounded-lg pr-24 font-mono" />
+                <button id="copyCodeBtn" class="absolute right-2 bottom-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700">Copy</button>
             </div>
             <p id="copyFeedback" class="text-green-600 text-sm mt-2 h-4"></p>
+            
+            <p class="text-xs text-gray-500 mt-4">💡 Tip: Name format is <span class="font-mono">Name:code</span> — paste directly into the Fashion Show!</p>
         </div>
     </div>
+
+    <!-- Show Code Modal (for multi-designer) -->
+    <div id="showCodeModal" class="modal" style="display: none;">
+        <div class="modal-content max-w-lg">
+            <span id="closeShowCodeModalBtn" class="modal-close">&times;</span>
+            <h3 class="text-2xl font-semibold mb-2 text-center">🎭 Your Show Code</h3>
+            <p class="text-gray-600 mb-4 text-center">Walk to the facilitator's device and type this code:</p>
+            
+            <div id="showCodeDisplay" class="show-code-display mb-4">
+                CODE
+            </div>
+            
+            <button id="copyShowCodeBtn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-colors mb-2">
+                📋 Copy Code
+            </button>
+            <p id="showCodeCopyFeedback" class="text-green-600 text-sm text-center h-4 mb-4"></p>
+            
+            <div class="bg-gray-100 rounded-lg p-3 text-sm mb-3">
+                <p class="font-medium text-gray-700 mb-1">Your outfits in this show:</p>
+                <ul id="showCodeOutfitList" class="text-gray-600 text-xs space-y-1 max-h-32 overflow-y-auto">
+                </ul>
+            </div>
+            
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-500">
+                <span>Your lighting:</span>
+                <span id="showCodeColor1" class="w-5 h-5 rounded border border-gray-300"></span>
+                <span id="showCodeColor2" class="w-5 h-5 rounded border border-gray-300"></span>
+                <span id="showCodeColor3" class="w-5 h-5 rounded border border-gray-300"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Container -->
+    <div id="confettiContainer" class="confetti-container"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- DATABASE ---
             const closetData = {
                 tops: [
-                    { id: 1, imageUrl: 'https://i.postimg.cc/wM2YrWZ5/23cdaa30_4d79_4dae_b6a2_234bceabade7.png' },
-                    { id: 2, imageUrl: 'https://i.postimg.cc/Y0RBPXZQ/2abddbbf_58f6_4d30_913b_630dcd488836.png' },
-                    { id: 3, imageUrl: 'https://i.postimg.cc/90bHkxKZ/3fe6b61d_ef58_4842_84ee_fcc413cbd874.png' },
-                    { id: 4, imageUrl: 'https://i.postimg.cc/WpwVt3zT/4225949e_4f23_40af_835f_a513a94205f8.png' },
+                    { id: 1, imageUrl: 'https://i.postimg.cc/tTn7JMmR/e3ce812f_d569_4bf4_8c0d_32fca424fdbe.png' },
+                    { id: 2, imageUrl: 'https://i.postimg.cc/tTn7JMms/e63d4ec1_a94d_4b0e_8c68_f49c2e54fb64.png' },
+                    { id: 3, imageUrl: 'https://i.postimg.cc/1tV4XjYN/ff570462_e58a_49ac_97b4_85af7afeba71.png' },
+                    { id: 4, imageUrl: 'https://i.postimg.cc/Tw5h14Hd/d4ad65b2_f537_4e3d_9bac_be5ae8b9d038.png' },
                     { id: 5, imageUrl: 'https://i.postimg.cc/qR6gq5Zf/080735cf_8e2c_442b_9c52_63d8d4560794.png' },
                     { id: 6, imageUrl: 'https://i.postimg.cc/JzKs2Jks/0b388a6c_9933_4588_b579_40ce05c2f7ec.png' },
                     { id: 7, imageUrl: 'https://i.postimg.cc/8C0j1Swg/1387e6bf_0c84_471b_bbb4_b321ed5b205c.png' },
@@ -370,12 +985,6 @@
                     { id: 25, imageUrl: 'https://i.postimg.cc/vBxDTNSs/b3b7a75f_6024_467f_b3ca_373accc882b7.png' },
                     { id: 26, imageUrl: 'https://i.postimg.cc/Tw5h14Hd/d4ad65b2_f537_4e3d_9bac_be5ae8b9d038.png' },
                     { id: 27, imageUrl: 'https://i.postimg.cc/FRk1zBn9/dd5c6fa2_f4cb_4352_a302_403d1bd379b3.png' },
-                    { id: 28, imageUrl: 'https://i.postimg.cc/tTn7JMmR/e3ce812f_d569_4bf4_8c0d_32fca424fdbe.png' },
-                    { id: 29, imageUrl: 'https://i.postimg.cc/tTn7JMms/e63d4ec1_a94d_4b0e_8c68_f49c2e54fb64.png' },
-                    { id: 30, imageUrl: 'https://i.postimg.cc/1tV4XjYN/ff570462_e58a_49ac_97b4_85af7afeba71.png' },
-                    { id: 31, imageUrl: 'https://i.postimg.cc/Tw5h14Hd/d4ad65b2_f537_4e3d_9bac_be5ae8b9d038.png' },
-
-
                 ],
                 bottoms: [
                     { id: 1, name: 'Barrel Leg Jeans', imageUrl: 'https://i.postimg.cc/qpSNvzvG/Barrel-leg-jean-CK153.png' },
@@ -411,6 +1020,13 @@
                 outerwear: null
             };
 
+            // --- STORAGE KEYS ---
+            const STORAGE_KEYS = {
+                recentOutfits: 'wardrobe_recent_outfits',
+                savedShows: 'wardrobe_saved_shows',
+                preferences: 'wardrobe_preferences'
+            };
+
             // --- BUILDER ELEMENTS ---
             const closetElement = document.getElementById('closet');
             const randomizeBtn = document.getElementById('randomizeBtn');
@@ -428,16 +1044,49 @@
             const submitModal = document.getElementById('submitModal');
             const closeModalBtn = document.getElementById('closeModalBtn');
             const outfitCodeOutput = document.getElementById('outfitCodeOutput');
+            const outfitNameInput = document.getElementById('outfitNameInput');
             const copyCodeBtn = document.getElementById('copyCodeBtn');
             const copyFeedback = document.getElementById('copyFeedback');
+            const confettiContainer = document.getElementById('confettiContainer');
 
             // --- GALLERY ELEMENTS ---
             const outfitCodesInput = document.getElementById('outfitCodes');
+            const clearCodesBtn = document.getElementById('clearCodesBtn');
             const loadShowBtn = document.getElementById('loadShowBtn');
             const fashionShowGrid = document.getElementById('fashion-show-grid');
+            const emptyGalleryPlaceholder = document.getElementById('emptyGalleryPlaceholder');
+            const shuffleSequenceBtn = document.getElementById('shuffleSequenceBtn');
+
+            // --- DESIGNER CODE ELEMENTS ---
+            const designerNameInput = document.getElementById('designerNameInput');
+            const getShowCodeBtn = document.getElementById('getShowCodeBtn');
+            const designerOutfitCount = document.getElementById('designerOutfitCount');
+            const designerColor1 = document.getElementById('designerColor1');
+            const designerColor2 = document.getElementById('designerColor2');
+            const designerColor3 = document.getElementById('designerColor3');
+            const showCodeModal = document.getElementById('showCodeModal');
+            const closeShowCodeModalBtn = document.getElementById('closeShowCodeModalBtn');
+            const showCodeDisplay = document.getElementById('showCodeDisplay');
+            const showCodeOutfitList = document.getElementById('showCodeOutfitList');
+            const showCodeCopyFeedback = document.getElementById('showCodeCopyFeedback');
+            const copyShowCodeBtn = document.getElementById('copyShowCodeBtn');
+
+            // --- COLLECT MODE ELEMENTS ---
+            const designerCodeInput = document.getElementById('designerCodeInput');
+            const addDesignerBtn = document.getElementById('addDesignerBtn');
+            const collectedDesigners = document.getElementById('collectedDesigners');
+            const buildCombinedShowBtn = document.getElementById('buildCombinedShowBtn');
+            const clearCollectionBtn = document.getElementById('clearCollectionBtn');
+            const collectionStats = document.getElementById('collectionStats');
+
+            // --- SAVED SHOWS ELEMENTS ---
+            const saveShowNameInput = document.getElementById('saveShowName');
+            const saveShowBtn = document.getElementById('saveShowBtn');
+            const savedShowsList = document.getElementById('savedShowsList');
+            const recentOutfitsList = document.getElementById('recentOutfitsList');
 
             // Fashion show controls
-            const outfitSequenceInput = document.getElementById('outfitSequence');
+            const transitionTypeSelect = document.getElementById('transitionType');
             const songSelect = document.getElementById('songSelect');
             const outfitDurationInput = document.getElementById('outfitDuration');
             const transitionDurationInput = document.getElementById('transitionDuration');
@@ -450,6 +1099,11 @@
             const showStatus = document.getElementById('showStatus');
             const showNotesInput = document.getElementById('showNotes');
             const stageSpotlight = document.getElementById('stageSpotlight');
+            const stageOutfitEl = document.getElementById('stageOutfit');
+            const stageOutfitName = document.getElementById('stageOutfitName');
+            const stageWrapper = document.getElementById('stageWrapper');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const stageCounter = document.getElementById('stageCounter');
             const stageSlots = {
                 tops: document.getElementById('stageTop'),
                 outerwear: document.getElementById('stageOuterwear'),
@@ -458,11 +1112,530 @@
                 accessories: document.getElementById('stageAccessory')
             };
 
+            // Timeline & Navigation
+            const showTimeline = document.getElementById('showTimeline');
+            const timelineDropzone = document.getElementById('timelineDropzone');
+            const clearTimelineBtn = document.getElementById('clearTimelineBtn');
+            const clearSequenceBtn = document.getElementById('clearSequenceBtn');
+            const manualNavControls = document.getElementById('manualNavControls');
+            const prevOutfitBtn = document.getElementById('prevOutfitBtn');
+            const pauseShowBtn = document.getElementById('pauseShowBtn');
+            const nextOutfitBtn = document.getElementById('nextOutfitBtn');
+            const showProgressBar = document.getElementById('showProgressBar');
+            const showProgressText = document.getElementById('showProgressText');
+
+            // Export/Import
+            const exportShowBtn = document.getElementById('exportShowBtn');
+            const importShowInput = document.getElementById('importShowInput');
+
             let showTimer = null;
             let currentShowIndex = 0;
             let showOrder = [];
             let showOutfits = [];
             let audioPlayer = null;
+            let isPaused = false;
+            let timelineSequence = []; // Array of outfit indices for the timeline
+
+            // Designer collection state
+            let collectedDesignerData = []; // { name, outfits: [{code, name, designer}] }
+
+            // --- CONFETTI ---
+            function launchConfetti() {
+                const colors = ['#ff3b81', '#4f46e5', '#22c55e', '#fbbf24', '#ec4899', '#8b5cf6'];
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.width = (Math.random() * 8 + 6) + 'px';
+                    confetti.style.height = (Math.random() * 8 + 6) + 'px';
+                    confettiContainer.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }
+            }
+
+            // --- LOCAL STORAGE HELPERS ---
+            function getStoredData(key) {
+                try {
+                    return JSON.parse(localStorage.getItem(key)) || [];
+                } catch {
+                    return [];
+                }
+            }
+
+            function setStoredData(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+
+            // --- DESIGNER CODE ENCODING/DECODING ---
+            // Format: DESIGNER-OUTFITDATA where OUTFITDATA is base36-encoded outfits
+            // Each outfit = 5 chars: T B S A O (all base36, tops single char now)
+            
+            function encodeOutfit(outfit) {
+                // Base36 keeps IDs compact (0-9A-Z)
+                const t = (outfit.tops || 0).toString(36);
+                const b = (outfit.bottoms || 0).toString(36);
+                const s = (outfit.shoes || 0).toString(36);
+                const a = (outfit.accessories || 0).toString(36);
+                const o = (outfit.outerwear || 0).toString(36);
+                return t + b + s + a + o; // 5 chars per outfit
+            }
+
+            function decodeOutfit(code) {
+                // Support new 5-char base36 format and legacy 6-char hex format
+                if (code.length === 5) {
+                    return {
+                        tops: parseInt(code[0], 36),
+                        bottoms: parseInt(code[1], 36),
+                        shoes: parseInt(code[2], 36),
+                        accessories: parseInt(code[3], 36),
+                        outerwear: parseInt(code[4], 36)
+                    };
+                }
+                if (code.length === 6) {
+                    return {
+                        tops: parseInt(code.slice(0, 2), 16),
+                        bottoms: parseInt(code[2], 16),
+                        shoes: parseInt(code[3], 16),
+                        accessories: parseInt(code[4], 16),
+                        outerwear: parseInt(code[5], 16)
+                    };
+                }
+                return null;
+            }
+
+            function generateDesignerCode(name, outfits) {
+                const cleanName = name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+                const outfitData = outfits.map(o => encodeOutfit({
+                    tops: o.tops?.id || 0,
+                    bottoms: o.bottoms?.id || 0,
+                    shoes: o.shoes?.id || 0,
+                    accessories: o.accessories?.id || 0,
+                    outerwear: o.outerwear?.id || 0
+                })).join('');
+                
+                // Include spotlight colors from designer's color pickers (6 hex chars each, no #)
+                const colors = [
+                    designerColor1.value.slice(1),
+                    designerColor2.value.slice(1),
+                    designerColor3.value.slice(1)
+                ].join('');
+                
+                return cleanName + '-' + outfitData + '-' + colors;
+            }
+
+            function parseDesignerCode(code) {
+                const parts = code.toUpperCase().split('-');
+                // Format: NAME-OUTFITDATA-COLORS (colors optional for backwards compatibility)
+                if (parts.length < 2) return null;
+                
+                const name = parts[0];
+                const data = parts[1];
+                
+                // Parse spotlight colors if present (18 hex chars = 3 colors * 6 chars each)
+                let spotlightColors = null;
+                if (parts.length >= 3 && parts[2].length === 18) {
+                    spotlightColors = {
+                        color1: '#' + parts[2].slice(0, 6),
+                        color2: '#' + parts[2].slice(6, 12),
+                        color3: '#' + parts[2].slice(12, 18)
+                    };
+                }
+                
+                // Support new 5-char base36 outfits and legacy 6-char hex outfits
+                const chunkSize = (data.length % 5 === 0) ? 5 : (data.length % 6 === 0 ? 6 : null);
+                if (!chunkSize) return null;
+
+                const outfits = [];
+                for (let i = 0; i < data.length; i += chunkSize) {
+                    const decoded = decodeOutfit(data.slice(i, i + chunkSize));
+                    if (decoded) {
+                        outfits.push({
+                            ...decoded,
+                            code: `${decoded.tops}-${decoded.bottoms}-${decoded.shoes}-${decoded.accessories}-${decoded.outerwear}`,
+                            designer: name
+                        });
+                    }
+                }
+                
+                return { name, outfits, spotlightColors };
+            }
+
+            function updateDesignerOutfitCount() {
+                const count = showOutfits.length;
+                designerOutfitCount.textContent = `${count} outfit${count !== 1 ? 's' : ''} in gallery`;
+                
+                // Update button state
+                getShowCodeBtn.disabled = count === 0;
+                
+                // Update visual preview
+                renderDesignerOutfitPreview();
+            }
+
+            function renderDesignerOutfitPreview() {
+                const preview = document.getElementById('designerOutfitPreview');
+                if (!preview) return;
+                
+                if (showOutfits.length === 0) {
+                    preview.innerHTML = '<p class="text-xs text-purple-400 italic w-full text-center py-2">Load outfits into the gallery first</p>';
+                    return;
+                }
+                
+                preview.innerHTML = showOutfits.map((outfit, idx) => {
+                    // Get the top image for the preview thumbnail
+                    const topImg = outfit.tops?.imageUrl || '';
+                    const outfitName = outfit.name || `Outfit ${idx + 1}`;
+                    
+                    return `
+                        <div class="designer-outfit-thumb" data-idx="${idx}" title="${outfitName}">
+                            ${topImg ? `<img src="${topImg}" alt="${outfitName}" class="w-full h-full object-contain" />` : '<span class="text-xs text-gray-400">${idx + 1}</span>'}
+                            <span class="outfit-num">${idx + 1}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function openShowCodeModal() {
+                const name = designerNameInput.value.trim();
+                if (!name) {
+                    alert('Please enter your name first!');
+                    designerNameInput.focus();
+                    return;
+                }
+                if (showOutfits.length === 0) {
+                    alert('Load outfits into the gallery first!');
+                    return;
+                }
+
+                const code = generateDesignerCode(name, showOutfits);
+                showCodeDisplay.textContent = code;
+                
+                showCodeOutfitList.innerHTML = showOutfits.map((o, i) => {
+                    const outfitCode = `${o.tops?.id || 0}-${o.bottoms?.id || 0}-${o.shoes?.id || 0}-${o.accessories?.id || 0}-${o.outerwear?.id || 0}`;
+                    return `<li>${i + 1}. ${o.name || outfitCode}</li>`;
+                }).join('');
+
+                // Show the selected colors
+                document.getElementById('showCodeColor1').style.background = designerColor1.value;
+                document.getElementById('showCodeColor2').style.background = designerColor2.value;
+                document.getElementById('showCodeColor3').style.background = designerColor3.value;
+
+                showCodeCopyFeedback.textContent = '';
+                showCodeModal.style.display = 'flex';
+            }
+
+            function closeShowCodeModal() {
+                showCodeModal.style.display = 'none';
+            }
+
+            // --- COLLECT MODE ---
+            function renderCollectedDesigners() {
+                if (collectedDesignerData.length === 0) {
+                    collectedDesigners.innerHTML = '<p class="text-sm text-gray-500 italic">No designers added yet</p>';
+                    buildCombinedShowBtn.disabled = true;
+                    collectionStats.textContent = '';
+                    return;
+                }
+
+                collectedDesigners.innerHTML = collectedDesignerData.map((d, idx) => {
+                    const colorDots = d.spotlightColors ? `
+                        <span class="flex gap-0.5 ml-1">
+                            <span class="w-2 h-2 rounded-full" style="background:${d.spotlightColors.color1}"></span>
+                            <span class="w-2 h-2 rounded-full" style="background:${d.spotlightColors.color2}"></span>
+                            <span class="w-2 h-2 rounded-full" style="background:${d.spotlightColors.color3}"></span>
+                        </span>
+                    ` : '';
+                    return `
+                        <span class="designer-chip">
+                            ${d.name}
+                            <span class="count">${d.outfits.length}</span>
+                            ${colorDots}
+                            <span class="remove" data-idx="${idx}">&times;</span>
+                        </span>
+                    `;
+                }).join('');
+
+                collectedDesigners.querySelectorAll('.remove').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const idx = parseInt(el.dataset.idx, 10);
+                        collectedDesignerData.splice(idx, 1);
+                        renderCollectedDesigners();
+                    });
+                });
+
+                buildCombinedShowBtn.disabled = false;
+                
+                const totalOutfits = collectedDesignerData.reduce((sum, d) => sum + d.outfits.length, 0);
+                collectionStats.textContent = `${collectedDesignerData.length} designers, ${totalOutfits} outfits`;
+            }
+
+            function addDesignerFromCode() {
+                const code = designerCodeInput.value.trim();
+                if (!code) return;
+
+                const parsed = parseDesignerCode(code);
+                if (!parsed || parsed.outfits.length === 0) {
+                    alert('Invalid code! Make sure it\'s in the format: NAME-OUTFITDATA');
+                    return;
+                }
+
+                // Check for duplicate designer
+                const existing = collectedDesignerData.find(d => d.name === parsed.name);
+                if (existing) {
+                    if (!confirm(`${parsed.name} already added. Replace their outfits?`)) {
+                        return;
+                    }
+                    collectedDesignerData = collectedDesignerData.filter(d => d.name !== parsed.name);
+                }
+
+                collectedDesignerData.push(parsed);
+                designerCodeInput.value = '';
+                renderCollectedDesigners();
+                
+                showStatus.textContent = `✓ ${parsed.name} added (${parsed.outfits.length} outfits)`;
+            }
+
+            function buildRoundRobinShow() {
+                if (collectedDesignerData.length === 0) return;
+
+                // Find max outfits any designer has
+                const maxOutfits = Math.max(...collectedDesignerData.map(d => d.outfits.length));
+                
+                // Build round-robin order with spotlight colors per outfit
+                const allOutfits = [];
+                for (let round = 0; round < maxOutfits; round++) {
+                    for (const designer of collectedDesignerData) {
+                        if (designer.outfits[round]) {
+                            const outfit = designer.outfits[round];
+                            allOutfits.push({
+                                code: outfit.code,
+                                name: outfit.name || `Outfit ${round + 1}`,
+                                designer: designer.name,
+                                spotlightColors: designer.spotlightColors
+                            });
+                        }
+                    }
+                }
+
+                // Store spotlight color sequence for playback
+                window.combinedShowSpotlights = allOutfits.map(o => o.spotlightColors);
+
+                // Convert to outfit codes for the textarea
+                const lines = allOutfits.map(o => {
+                    const label = `${o.designer} - ${o.name}`;
+                    return `${label}:${o.code}`;
+                });
+
+                outfitCodesInput.value = lines.join('\n');
+                loadFashionShow();
+                
+                // Auto-populate timeline
+                timelineSequence = showOutfits.map((_, idx) => idx);
+                renderTimeline();
+
+                // Count how many designers had custom colors
+                const designersWithColors = collectedDesignerData.filter(d => d.spotlightColors).length;
+                const colorNote = designersWithColors > 0 ? ` (${designersWithColors} with custom lighting)` : '';
+                showStatus.textContent = `Combined show ready! ${allOutfits.length} outfits in round-robin order${colorNote}.`;
+            }
+
+            function clearCollection() {
+                collectedDesignerData = [];
+                renderCollectedDesigners();
+                showStatus.textContent = 'Collection cleared.';
+            }
+
+            // --- RECENT OUTFITS ---
+            function addRecentOutfit(code, name) {
+                let recent = getStoredData(STORAGE_KEYS.recentOutfits);
+                const entry = { code, name: name || '', timestamp: Date.now() };
+                // Remove duplicate codes
+                recent = recent.filter(r => r.code !== code);
+                recent.unshift(entry);
+                recent = recent.slice(0, 10); // Keep last 10
+                setStoredData(STORAGE_KEYS.recentOutfits, recent);
+                renderRecentOutfits();
+            }
+
+            function renderRecentOutfits() {
+                const recent = getStoredData(STORAGE_KEYS.recentOutfits);
+                if (!recent.length) {
+                    recentOutfitsList.innerHTML = '<p class="text-xs text-gray-500 italic">Submit outfits to see them here.</p>';
+                    return;
+                }
+                recentOutfitsList.innerHTML = recent.map(r => `
+                    <span class="recent-outfit" data-code="${r.code}" title="Click to add to codes">
+                        ${r.name || r.code}
+                    </span>
+                `).join('');
+                
+                recentOutfitsList.querySelectorAll('.recent-outfit').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const code = el.dataset.code;
+                        const name = el.textContent.trim();
+                        const line = name !== code ? `${name}:${code}` : code;
+                        if (!outfitCodesInput.value.includes(code)) {
+                            outfitCodesInput.value = outfitCodesInput.value.trim() + (outfitCodesInput.value ? '\n' : '') + line;
+                        }
+                        showStatus.textContent = 'Added to outfit codes!';
+                    });
+                });
+            }
+
+            // --- SAVED SHOWS ---
+            function saveCurrentShow() {
+                const name = saveShowNameInput.value.trim();
+                if (!name) {
+                    showStatus.textContent = 'Please enter a name for the show.';
+                    return;
+                }
+                
+                const showConfig = {
+                    name,
+                    codes: outfitCodesInput.value,
+                    notes: showNotesInput.value,
+                    timeline: timelineSequence,
+                    settings: {
+                        transition: transitionTypeSelect.value,
+                        song: songSelect.value,
+                        duration: outfitDurationInput.value,
+                        transitionDuration: transitionDurationInput.value,
+                        c1: lightColor1Input.value,
+                        c2: lightColor2Input.value,
+                        c3: lightColor3Input.value
+                    },
+                    timestamp: Date.now()
+                };
+
+                let saved = getStoredData(STORAGE_KEYS.savedShows);
+                saved = saved.filter(s => s.name !== name); // Replace if same name
+                saved.unshift(showConfig);
+                saved = saved.slice(0, 20); // Keep 20 max
+                setStoredData(STORAGE_KEYS.savedShows, saved);
+                
+                saveShowNameInput.value = '';
+                renderSavedShows();
+                showStatus.textContent = `Show "${name}" saved!`;
+            }
+
+            function loadSavedShow(showConfig) {
+                outfitCodesInput.value = showConfig.codes || '';
+                showNotesInput.value = showConfig.notes || '';
+                if (showConfig.settings) {
+                    transitionTypeSelect.value = showConfig.settings.transition || 'fade';
+                    songSelect.value = showConfig.settings.song || 'none';
+                    outfitDurationInput.value = showConfig.settings.duration || 4;
+                    transitionDurationInput.value = showConfig.settings.transitionDuration || 1;
+                    lightColor1Input.value = showConfig.settings.c1 || '#ff3b81';
+                    lightColor2Input.value = showConfig.settings.c2 || '#4f46e5';
+                    lightColor3Input.value = showConfig.settings.c3 || '#22c55e';
+                }
+                timelineSequence = showConfig.timeline || [];
+                loadFashionShow();
+                renderTimeline();
+                applySpotlightColors();
+                showStatus.textContent = `Loaded "${showConfig.name}"`;
+            }
+
+            function deleteSavedShow(name) {
+                let saved = getStoredData(STORAGE_KEYS.savedShows);
+                saved = saved.filter(s => s.name !== name);
+                setStoredData(STORAGE_KEYS.savedShows, saved);
+                renderSavedShows();
+                showStatus.textContent = `Deleted "${name}"`;
+            }
+
+            function editSavedShow(showConfig) {
+                // Load the show for editing
+                loadSavedShow(showConfig);
+                // Pre-fill the save name so resaving updates the same show
+                saveShowNameInput.value = showConfig.name;
+                showStatus.textContent = `Editing "${showConfig.name}" - Add outfits and click Save to update`;
+            }
+
+            function renderSavedShows() {
+                const saved = getStoredData(STORAGE_KEYS.savedShows);
+                if (!saved.length) {
+                    savedShowsList.innerHTML = '<p class="text-xs text-gray-500 italic">No saved shows yet.</p>';
+                    return;
+                }
+                savedShowsList.innerHTML = saved.map(s => `
+                    <div class="saved-show-item">
+                        <span class="text-sm font-medium cursor-pointer hover:text-indigo-600 load-show flex-1" data-name="${s.name}">${s.name}</span>
+                        <div class="flex gap-2">
+                            <button class="text-xs text-indigo-500 hover:text-indigo-700 edit-show" data-name="${s.name}" title="Edit & add outfits">✎ Edit</button>
+                            <button class="text-xs text-red-500 hover:text-red-700 delete-show" data-name="${s.name}" title="Delete">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                savedShowsList.querySelectorAll('.load-show').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const show = saved.find(s => s.name === el.dataset.name);
+                        if (show) loadSavedShow(show);
+                    });
+                });
+
+                savedShowsList.querySelectorAll('.edit-show').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const show = saved.find(s => s.name === el.dataset.name);
+                        if (show) editSavedShow(show);
+                    });
+                });
+
+                savedShowsList.querySelectorAll('.delete-show').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteSavedShow(el.dataset.name);
+                    });
+                });
+            }
+
+            // --- EXPORT/IMPORT ---
+            function exportShowToJSON() {
+                const showConfig = {
+                    name: showNotesInput.value.split('\n')[0] || 'Untitled Show',
+                    codes: outfitCodesInput.value,
+                    notes: showNotesInput.value,
+                    timeline: timelineSequence,
+                    settings: {
+                        transition: transitionTypeSelect.value,
+                        song: songSelect.value,
+                        duration: outfitDurationInput.value,
+                        transitionDuration: transitionDurationInput.value,
+                        c1: lightColor1Input.value,
+                        c2: lightColor2Input.value,
+                        c3: lightColor3Input.value
+                    },
+                    exportedAt: new Date().toISOString()
+                };
+
+                const blob = new Blob([JSON.stringify(showConfig, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `fashion-show-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showStatus.textContent = 'Show exported!';
+            }
+
+            function importShowFromJSON(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const showConfig = JSON.parse(e.target.result);
+                        loadSavedShow(showConfig);
+                        showStatus.textContent = 'Show imported successfully!';
+                    } catch {
+                        showStatus.textContent = 'Invalid JSON file.';
+                    }
+                };
+                reader.readAsText(file);
+            }
 
             // --- URL helpers for shareable shows ---
             function buildShowShareUrl() {
@@ -474,20 +1647,17 @@
                     params.set('codes', rawCodes.join('|'));
                 }
 
-                if (outfitSequenceInput.value.trim()) {
-                    params.set('seq', outfitSequenceInput.value.trim());
+                if (timelineSequence.length) {
+                    params.set('seq', timelineSequence.join(','));
                 }
 
                 if (songSelect.value && songSelect.value !== 'none') {
                     params.set('song', songSelect.value);
                 }
 
-                if (outfitDurationInput.value) {
-                    params.set('dur', outfitDurationInput.value);
-                }
-                if (transitionDurationInput.value) {
-                    params.set('trans', transitionDurationInput.value);
-                }
+                params.set('trans', transitionTypeSelect.value);
+                params.set('dur', outfitDurationInput.value);
+                params.set('tdur', transitionDurationInput.value);
 
                 params.set('c1', lightColor1Input.value || '#ff3b81');
                 params.set('c2', lightColor2Input.value || '#4f46e5');
@@ -503,7 +1673,7 @@
             function applyUrlShowConfig() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (!urlParams.has('codes') && !urlParams.has('notes')) {
-                    return; // Nothing special in URL
+                    return;
                 }
 
                 const codesParam = urlParams.get('codes');
@@ -514,12 +1684,16 @@
 
                 const seqParam = urlParams.get('seq');
                 if (seqParam) {
-                    outfitSequenceInput.value = seqParam;
+                    timelineSequence = seqParam.split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+                }
+
+                const transParam = urlParams.get('trans');
+                if (transParam && ['fade', 'slide', 'none'].includes(transParam)) {
+                    transitionTypeSelect.value = transParam;
                 }
 
                 const songParam = urlParams.get('song');
                 if (songParam) {
-                    // Validate against existing options
                     const optionExists = Array.from(songSelect.options).some(opt => opt.value === songParam);
                     if (optionExists) {
                         songSelect.value = songParam;
@@ -527,13 +1701,10 @@
                 }
 
                 const durParam = urlParams.get('dur');
-                if (durParam) {
-                    outfitDurationInput.value = durParam;
-                }
-                const transParam = urlParams.get('trans');
-                if (transParam) {
-                    transitionDurationInput.value = transParam;
-                }
+                if (durParam) outfitDurationInput.value = durParam;
+                
+                const tdurParam = urlParams.get('tdur');
+                if (tdurParam) transitionDurationInput.value = tdurParam;
 
                 const c1 = urlParams.get('c1');
                 const c2 = urlParams.get('c2');
@@ -543,24 +1714,22 @@
                 if (c3) lightColor3Input.value = c3;
 
                 const notes = urlParams.get('notes');
-                if (notes) {
-                    showNotesInput.value = notes;
-                }
+                if (notes) showNotesInput.value = notes;
 
-                // Sync the lights and gallery from URL
                 applySpotlightColors();
                 loadFashionShow();
+                renderTimeline();
 
                 if (codesParam) {
                     showStatus.textContent = 'Loaded show from shared link.';
+                    toggleView('gallery');
                 }
             }
 
             // --- FUNCTIONS ---
 
-            // Function to render all items in the closet
             function renderCloset() {
-                closetElement.innerHTML = ''; // Clear existing content
+                closetElement.innerHTML = '';
                 for (const category in closetData) {
                     const categoryContainer = document.createElement('div');
                     
@@ -582,7 +1751,6 @@
                         itemImg.src = item.imageUrl;
                         itemImg.alt = item.name;
                         itemImg.className = 'w-full h-24 md:h-32 object-contain rounded-md mb-2';
-                        // Handle image loading errors
                         itemImg.onerror = () => {
                             itemImg.src = `https://placehold.co/200x200/CCCCCC/FFFFFF?text=Error`;
                             itemImg.alt = 'Image not found';
@@ -604,7 +1772,6 @@
                 }
             }
             
-            // Function to handle item selection
             function selectItem(category, itemId) {
                 const selectedItem = closetData[category].find(item => item.id === itemId);
                 
@@ -618,40 +1785,34 @@
                 updateSelectedStyles();
             }
             
-            // Function to update the mannequin display
             function updateMannequin() {
                 let isMainOutfitEmpty = true;
                 
                 for (const category in currentOutfit) {
                     const mannequinSlot = document.getElementById(`mannequin-${category}`);
-                    if (!mannequinSlot) continue; // Skip if slot doesn't exist
+                    if (!mannequinSlot) continue;
 
                     if (currentOutfit[category]) {
                         mannequinSlot.style.backgroundImage = `url(${currentOutfit[category].imageUrl})`;
                         
-                        // If it's a main category, set flag
                         if (['tops', 'bottoms', 'shoes'].includes(category)) {
                             isMainOutfitEmpty = false;
                         }
                         
-                        // Hide placeholder text in new boxes
                         const placeholder = mannequinSlot.querySelector('span');
                         if (placeholder) placeholder.style.opacity = '0';
 
                     } else {
                         mannequinSlot.style.backgroundImage = 'none';
                         
-                        // Show placeholder text in new boxes
                         const placeholder = mannequinSlot.querySelector('span');
                         if (placeholder) placeholder.style.opacity = '1';
                     }
                 }
                 
-                // Show/hide the main mannequin icon
                 mannequinIcon.style.display = isMainOutfitEmpty ? 'block' : 'none';
             }
             
-            // Function to highlight selected items in the closet
             function updateSelectedStyles() {
                 document.querySelectorAll('.item-card').forEach(card => {
                     const category = card.dataset.category;
@@ -664,42 +1825,28 @@
                 });
             }
 
-            // Function to randomize the outfit
             function randomizeOutfit() {
-                // --- 1. Pick a random item for each category independently ---
                 for (const category in closetData) {
                     const items = closetData[category];
                     const randomIndex = Math.floor(Math.random() * items.length);
                     currentOutfit[category] = items[randomIndex];
                 }
 
-                // --- 2. Define and apply your styling rule ---
-                const ruleShoeId = 3; // 'New Stevie Knee-High Boots in Leather'
-                const ruleBottomId = 4; // 'New Gwyneth Slip Skirt in Viscose Charmeuse'
-
-                // Get the IDs of the randomly selected items
+                const ruleShoeId = 3;
+                const ruleBottomId = 4;
                 const selectedShoeId = currentOutfit.shoes ? currentOutfit.shoes.id : 0;
                 const selectedBottomId = currentOutfit.bottoms ? currentOutfit.bottoms.id : 0;
 
-                // RULE: If the boots (shoe:3) are selected, the skirt (bottom:4) MUST be selected.
                 if (selectedShoeId === ruleShoeId && selectedBottomId !== ruleBottomId) {
-                    // Fix the outfit: Force the bottoms to be the skirt
                     currentOutfit.bottoms = closetData.bottoms.find(item => item.id === ruleBottomId);
-                }
-                
-                // INVERSE RULE: If the skirt (bottom:4) is selected, the boots (shoe:3) MUST be selected.
-                // This makes them a "locked pair" in the randomizer.
-                else if (selectedBottomId === ruleBottomId && selectedShoeId !== ruleShoeId) {
-                    // Fix the outfit: Force the shoes to be the boots
+                } else if (selectedBottomId === ruleBottomId && selectedShoeId !== ruleShoeId) {
                     currentOutfit.shoes = closetData.shoes.find(item => item.id === ruleShoeId);
                 }
 
-                // --- 3. Update the UI ---
                 updateMannequin();
                 updateSelectedStyles();
             }
             
-            // Function to clear the outfit
             function clearOutfit() {
                  for (const category in currentOutfit) {
                     currentOutfit[category] = null;
@@ -708,7 +1855,6 @@
                 updateSelectedStyles();
             }
 
-            // --- NEW: View Toggling ---
             function toggleView(viewToShow) {
                 if (viewToShow === 'builder') {
                     builderView.style.display = 'grid';
@@ -724,13 +1870,12 @@
                     showBuilderBtn.classList.remove('active');
                     showGalleryBtn.classList.add('active');
                     showGalleryBtn.classList.remove('inactive');
+                    // Update the designer outfit preview when switching to Fashion Show
+                    renderDesignerOutfitPreview();
                 }
             }
 
-            // --- NEW: Modal and Sharing Functions ---
             function openSubmitModal() {
-                // Generate the code: topId-bottomId-shoeId-accessoryId-outerwearId
-                // Use '0' if no item is selected
                 const code = [
                     currentOutfit.tops ? currentOutfit.tops.id : 0,
                     currentOutfit.bottoms ? currentOutfit.bottoms.id : 0,
@@ -740,8 +1885,10 @@
                 ].join('-');
                 
                 outfitCodeOutput.value = code;
+                outfitNameInput.value = '';
                 copyFeedback.textContent = '';
                 submitModal.style.display = 'flex';
+                launchConfetti();
             }
 
             function closeSubmitModal() {
@@ -749,76 +1896,155 @@
             }
 
             function copyCodeToClipboard() {
-                outfitCodeOutput.select();
-                outfitCodeOutput.setSelectionRange(0, 99999); // For mobile devices
+                const name = outfitNameInput.value.trim();
+                const code = outfitCodeOutput.value;
+                const fullCode = name ? `${name}:${code}` : code;
                 
-                try {
+                navigator.clipboard.writeText(fullCode).then(() => {
+                    copyFeedback.textContent = 'Copied! ✓ Added to gallery';
+                    addRecentOutfit(code, name);
+                    addToGallery(fullCode);
+                    showSubmitFeedback();
+                }).catch(() => {
+                    outfitCodeOutput.value = fullCode;
+                    outfitCodeOutput.select();
                     document.execCommand('copy');
-                    copyFeedback.textContent = 'Copied to clipboard!';
-                } catch (err) {
-                    copyFeedback.textContent = 'Failed to copy. Please copy manually.';
+                    copyFeedback.textContent = 'Copied! ✓ Added to gallery';
+                    addRecentOutfit(code, name);
+                    addToGallery(fullCode);
+                    showSubmitFeedback();
+                });
+            }
+            
+            function showSubmitFeedback() {
+                const feedback = document.getElementById('submitFeedback');
+                if (feedback) {
+                    feedback.textContent = `✓ ${showOutfits.length} outfit${showOutfits.length !== 1 ? 's' : ''} in gallery`;
+                    setTimeout(() => { feedback.textContent = ''; }, 3000);
                 }
             }
+            
+            function addToGallery(outfitCode) {
+                // Add the outfit code to the gallery textarea and reload
+                const textarea = document.getElementById('outfitCodes');
+                if (textarea.value.trim()) {
+                    textarea.value += '\n' + outfitCode;
+                } else {
+                    textarea.value = outfitCode;
+                }
+                loadFashionShow();
+            }
 
-            // --- NEW: Gallery Functions ---
+            // --- Gallery Functions ---
+            function parseOutfitCode(line) {
+                const trimmed = line.trim();
+                if (!trimmed) return null;
+
+                let name = '';
+                let designer = '';
+                let codeStr = trimmed;
+
+                // Support "Name:code" or "Designer - Name:code" format
+                if (trimmed.includes(':')) {
+                    const colonIdx = trimmed.lastIndexOf(':');
+                    const possibleCode = trimmed.slice(colonIdx + 1);
+                    if (possibleCode.includes('-')) {
+                        let labelPart = trimmed.slice(0, colonIdx).trim();
+                        codeStr = possibleCode.trim();
+                        
+                        // Check for "Designer - Name" format
+                        if (labelPart.includes(' - ')) {
+                            const dashIdx = labelPart.indexOf(' - ');
+                            designer = labelPart.slice(0, dashIdx).trim();
+                            name = labelPart.slice(dashIdx + 3).trim();
+                        } else {
+                            name = labelPart;
+                        }
+                    }
+                }
+
+                const ids = codeStr.split('-');
+                if (ids.length !== 5) return null;
+
+                return {
+                    tops: closetData.tops.find(item => item.id === parseInt(ids[0])),
+                    bottoms: closetData.bottoms.find(item => item.id === parseInt(ids[1])),
+                    shoes: closetData.shoes.find(item => item.id === parseInt(ids[2])),
+                    accessories: closetData.accessories.find(item => item.id === parseInt(ids[3])),
+                    outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4])),
+                    code: codeStr,
+                    name: name,
+                    designer: designer
+                };
+            }
+
             function loadFashionShow() {
                 const lines = outfitCodesInput.value.trim().split('\n');
                 fashionShowGrid.innerHTML = '';
                 showOutfits = [];
 
-                lines.forEach((code, index) => {
-                    const trimmed = code.trim();
-                    if (!trimmed) return;
+                lines.forEach((line, index) => {
+                    const outfit = parseOutfitCode(line);
+                    if (!outfit) return;
 
-                    const ids = trimmed.split('-');
-                    if (ids.length !== 5) return;
-
-                    const outfit = {
-                        tops: closetData.tops.find(item => item.id === parseInt(ids[0])),
-                        bottoms: closetData.bottoms.find(item => item.id === parseInt(ids[1])),
-                        shoes: closetData.shoes.find(item => item.id === parseInt(ids[2])),
-                        accessories: closetData.accessories.find(item => item.id === parseInt(ids[3])),
-                        outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4])),
-                        code: trimmed,
-                        lineNumber: index + 1
-                    };
-
+                    outfit.lineNumber = index + 1;
+                    outfit.index = showOutfits.length;
                     showOutfits.push(outfit);
-                    renderOutfitCard(outfit, trimmed);
+                    renderOutfitCard(outfit);
                 });
 
-                showStatus.textContent = showOutfits.length ? `Loaded ${showOutfits.length} outfits.` : 'No valid outfit codes found.';
+                // Show/hide empty placeholder
+                if (showOutfits.length > 0) {
+                    hideEmptyPlaceholder();
+                } else {
+                    showEmptyPlaceholder();
+                }
+
+                // Update sequence badges after loading cards
+                setTimeout(() => updateGallerySequenceBadges(), 0);
+                
+                showStatus.textContent = showOutfits.length 
+                    ? `Loaded ${showOutfits.length} outfits. Click to add to show sequence.` 
+                    : 'No valid outfit codes found.';
+                
+                // Update the show code preview section
+                updateDesignerOutfitCount();
             }
 
-            function renderOutfitCard(outfit, code) {
+            function renderOutfitCard(outfit) {
                 const card = document.createElement('div');
-                card.className = 'relative gallery-card w-full rounded-lg overflow-hidden shadow-md';
+                card.className = 'relative gallery-card w-full rounded-lg overflow-hidden shadow-md cursor-pointer';
+                card.draggable = true;
+                card.dataset.outfitIndex = outfit.index;
 
-                // We'll create stacked slots just like the mannequin
                 const topSlot = document.createElement('div');
-                topSlot.className = 'gallery-slot absolute top-0 left-0 w-full h-1/2';
+                topSlot.className = 'gallery-slot slot-tops absolute top-[8%] left-0 w-full h-[45%]';
                 if (outfit.tops) topSlot.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
 
                 const outerwearSlot = document.createElement('div');
-                outerwearSlot.className = 'gallery-slot absolute top-0 left-0 w-full h-1/2';
+                outerwearSlot.className = 'gallery-slot slot-outerwear absolute top-[8%] left-0 w-full h-[45%]';
                 if (outfit.outerwear) outerwearSlot.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
 
                 const bottomSlot = document.createElement('div');
-                bottomSlot.className = 'gallery-slot absolute bottom-[25%] left-0 w-full h-1/2';
+                bottomSlot.className = 'gallery-slot slot-bottoms absolute top-[40%] left-0 w-full h-[45%]';
                 if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
                 
                 const shoeSlot = document.createElement('div');
-                shoeSlot.className = 'gallery-slot absolute bottom-0 left-0 w-full h-1/4';
+                shoeSlot.className = 'gallery-slot slot-shoes absolute bottom-[2%] left-0 w-full h-[22%]';
                 if (outfit.shoes) shoeSlot.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
 
                 const accessorySlot = document.createElement('div');
-                accessorySlot.className = 'gallery-slot absolute top-[-5%] left-0 w-full h-1/4';
+                accessorySlot.className = 'gallery-slot slot-accessories absolute top-[-5%] left-0 w-full h-[20%]';
                 if (outfit.accessories) accessorySlot.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
 
-                // Add a label to show the code
                 const codeLabel = document.createElement('div');
-                codeLabel.className = 'absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs font-mono py-1 px-2 rounded';
-                codeLabel.textContent = code;
+                codeLabel.className = 'absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs font-mono py-1 px-2 rounded z-10';
+                codeLabel.textContent = outfit.name || outfit.code;
+                
+                // Sequence number badge
+                const seqBadge = document.createElement('div');
+                seqBadge.className = 'gallery-seq-badge hidden';
+                seqBadge.dataset.outfitIndex = outfit.index;
                 
                 card.appendChild(topSlot);
                 card.appendChild(outerwearSlot);
@@ -826,8 +2052,228 @@
                 card.appendChild(shoeSlot);
                 card.appendChild(accessorySlot);
                 card.appendChild(codeLabel);
+                card.appendChild(seqBadge);
+
+                // Click to add/remove from show sequence
+                card.addEventListener('click', () => {
+                    toggleOutfitInSequence(outfit.index);
+                });
+
+                // Drag events for adding to timeline
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', outfit.index);
+                    card.classList.add('dragging');
+                });
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
 
                 fashionShowGrid.appendChild(card);
+            }
+
+            function toggleOutfitInSequence(outfitIndex) {
+                const idx = timelineSequence.indexOf(outfitIndex);
+                if (idx === -1) {
+                    // Add to sequence
+                    timelineSequence.push(outfitIndex);
+                } else {
+                    // Remove from sequence
+                    timelineSequence.splice(idx, 1);
+                }
+                updateGallerySequenceBadges();
+                showStatus.textContent = `Show has ${timelineSequence.length} outfits. Click outfits to add/remove.`;
+            }
+
+            function updateGallerySequenceBadges() {
+                // Update all badges in gallery grid
+                document.querySelectorAll('.gallery-seq-badge').forEach(badge => {
+                    const outfitIndex = parseInt(badge.dataset.outfitIndex);
+                    const seqPos = timelineSequence.indexOf(outfitIndex);
+                    if (seqPos !== -1) {
+                        badge.textContent = seqPos + 1;
+                        badge.classList.remove('hidden');
+                        badge.closest('.gallery-card').classList.add('in-sequence');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.closest('.gallery-card').classList.remove('in-sequence');
+                    }
+                });
+            }
+
+            // --- TIMELINE ---
+            function renderTimeline() {
+                if (!showTimeline) return;
+                
+                // Clear all except the dropzone
+                Array.from(showTimeline.children).forEach(child => {
+                    if (child !== timelineDropzone) child.remove();
+                });
+
+                timelineSequence.forEach((outfitIdx, seqIdx) => {
+                    const outfit = showOutfits[outfitIdx];
+                    if (!outfit) return;
+                    
+                    const item = createTimelineItem(outfit, seqIdx);
+                    if (timelineDropzone) {
+                        showTimeline.insertBefore(item, timelineDropzone);
+                    } else {
+                        showTimeline.appendChild(item);
+                    }
+                });
+
+                updateTimelineOrderNumbers();
+                updateGallerySequenceBadges();
+            }
+
+            function createTimelineItem(outfit, seqIdx) {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.draggable = true;
+                item.dataset.seqIndex = seqIdx;
+                item.dataset.outfitIndex = outfit.index;
+
+                // Mini preview
+                if (outfit.tops) {
+                    const topBg = document.createElement('div');
+                    topBg.className = 'absolute inset-0 bg-contain bg-center bg-no-repeat';
+                    topBg.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+                    item.appendChild(topBg);
+                }
+
+                const removeBtn = document.createElement('span');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '×';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    timelineSequence.splice(seqIdx, 1);
+                    renderTimeline();
+                });
+
+                const orderNum = document.createElement('span');
+                orderNum.className = 'order-num';
+                orderNum.textContent = seqIdx + 1;
+
+                item.appendChild(removeBtn);
+                item.appendChild(orderNum);
+
+                // Drag for reordering
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('timeline-index', seqIdx);
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    item.style.borderColor = '#4f46e5';
+                });
+                item.addEventListener('dragleave', () => {
+                    item.style.borderColor = 'transparent';
+                });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    item.style.borderColor = 'transparent';
+                    
+                    const fromTimelineIdx = e.dataTransfer.getData('timeline-index');
+                    if (fromTimelineIdx !== '') {
+                        // Reorder within timeline
+                        const fromIdx = parseInt(fromTimelineIdx, 10);
+                        const toIdx = parseInt(item.dataset.seqIndex, 10);
+                        if (fromIdx !== toIdx) {
+                            const [moved] = timelineSequence.splice(fromIdx, 1);
+                            timelineSequence.splice(toIdx, 0, moved);
+                            renderTimeline();
+                        }
+                    }
+                });
+
+                return item;
+            }
+
+            function updateTimelineOrderNumbers() {
+                showTimeline.querySelectorAll('.timeline-item').forEach((item, idx) => {
+                    item.dataset.seqIndex = idx;
+                    const orderNum = item.querySelector('.order-num');
+                    if (orderNum) orderNum.textContent = idx + 1;
+                });
+            }
+
+            // Timeline dropzone (optional, may not exist if timeline UI is hidden)
+            if (timelineDropzone) {
+                timelineDropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    timelineDropzone.classList.add('drag-over');
+                });
+                timelineDropzone.addEventListener('dragleave', () => {
+                    timelineDropzone.classList.remove('drag-over');
+                });
+                timelineDropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    timelineDropzone.classList.remove('drag-over');
+                    
+                    const outfitIdx = e.dataTransfer.getData('text/plain');
+                    if (outfitIdx !== '' && !e.dataTransfer.getData('timeline-index')) {
+                        timelineSequence.push(parseInt(outfitIdx, 10));
+                        renderTimeline();
+                    }
+                });
+            }
+
+            clearTimelineBtn?.addEventListener('click', () => {
+                timelineSequence = [];
+                renderTimeline();
+                updateGallerySequenceBadges();
+                showStatus.textContent = 'Sequence cleared.';
+            });
+
+            clearSequenceBtn?.addEventListener('click', () => {
+                if (timelineSequence.length > 0 && !confirm('Clear the show sequence?')) return;
+                timelineSequence = [];
+                updateGallerySequenceBadges();
+                showStatus.textContent = 'Show sequence cleared.';
+            });
+            
+            // Clear outfit codes textarea
+            clearCodesBtn?.addEventListener('click', () => {
+                if (outfitCodesInput.value.trim() && !confirm('Clear all outfit codes?')) return;
+                outfitCodesInput.value = '';
+                fashionShowGrid.innerHTML = '';
+                showOutfits = [];
+                timelineSequence = [];
+                updateDesignerOutfitCount();
+                updateGallerySequenceBadges();
+                showEmptyPlaceholder();
+                showStatus.textContent = 'Codes cleared.';
+            });
+            
+            // Shuffle sequence
+            shuffleSequenceBtn?.addEventListener('click', () => {
+                if (showOutfits.length < 2) {
+                    showStatus.textContent = 'Need at least 2 outfits to shuffle.';
+                    return;
+                }
+                // Fisher-Yates shuffle
+                const indices = showOutfits.map((_, i) => i);
+                for (let i = indices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [indices[i], indices[j]] = [indices[j], indices[i]];
+                }
+                timelineSequence = indices;
+                updateGallerySequenceBadges();
+                showStatus.textContent = `\ud83d\udd00 Shuffled ${indices.length} outfits into random order!`;
+            });
+            
+            function showEmptyPlaceholder() {
+                if (emptyGalleryPlaceholder) {
+                    emptyGalleryPlaceholder.style.display = 'flex';
+                }
+            }
+            
+            function hideEmptyPlaceholder() {
+                if (emptyGalleryPlaceholder) {
+                    emptyGalleryPlaceholder.style.display = 'none';
+                }
             }
 
             // --- Fashion Show Playback ---
@@ -836,51 +2282,137 @@
                 const c2 = lightColor2Input.value;
                 const c3 = lightColor3Input.value;
 
-                stageSpotlight.style.background = `radial-gradient(circle at 20% 0%, ${c1}, transparent 60%),
-                    radial-gradient(circle at 80% 0%, ${c2}, transparent 60%),
-                    radial-gradient(circle at 50% 80%, ${c3}, transparent 70%)`;
+                // Apply colors to individual spotlight beams
+                const beam1 = document.getElementById('spotlightBeam1');
+                const beam2 = document.getElementById('spotlightBeam2');
+                const beam3 = document.getElementById('spotlightBeam3');
+                const ambient = document.getElementById('spotlightAmbient');
 
-                stageSpotlight.style.setProperty('--c1', c1);
-                stageSpotlight.style.setProperty('--c2', c2);
-                stageSpotlight.style.setProperty('--c3', c3);
-                stageSpotlight.classList.add('stage-spotlight-active');
+                if (beam1) beam1.style.background = `linear-gradient(to bottom, ${c1}, transparent 70%)`;
+                if (beam2) beam2.style.background = `linear-gradient(to bottom, ${c2}, transparent 70%)`;
+                if (beam3) beam3.style.background = `linear-gradient(to bottom, ${c3}, transparent 70%)`;
+                
+                // Ambient glow combines all colors
+                if (ambient) {
+                    ambient.style.background = `
+                        radial-gradient(ellipse 60% 40% at 20% 20%, ${c1}40, transparent 50%),
+                        radial-gradient(ellipse 60% 40% at 80% 30%, ${c2}40, transparent 50%),
+                        radial-gradient(ellipse 80% 30% at 50% 90%, ${c3}40, transparent 50%)
+                    `;
+                }
+            }
+
+            function toggleFullscreen() {
+                const isFullscreen = stageWrapper.classList.contains('fullscreen-mode');
+                if (isFullscreen) {
+                    stageWrapper.classList.remove('fullscreen-mode');
+                    fullscreenBtn.innerHTML = '⛶ Fullscreen';
+                    document.body.style.overflow = '';
+                } else {
+                    stageWrapper.classList.add('fullscreen-mode');
+                    fullscreenBtn.innerHTML = '✕ Exit';
+                    document.body.style.overflow = 'hidden';
+                }
             }
 
             function clearStage() {
                 Object.values(stageSlots).forEach(slot => {
-                    slot.style.backgroundImage = 'none';
+                    if (slot) slot.style.backgroundImage = 'none';
                 });
+                stageOutfitName.classList.add('hidden');
             }
 
-            function showOutfitOnStage(outfit) {
+            function showOutfitOnStage(outfit, withTransition = true) {
+                const transitionType = transitionTypeSelect.value;
+                const transitionMs = parseFloat(transitionDurationInput.value) * 1000 || 500;
+
+                if (withTransition && transitionType !== 'none') {
+                    // Transition out
+                    stageOutfitEl.classList.add(transitionType === 'slide' ? 'slide-out' : 'fade-out');
+                    
+                    setTimeout(() => {
+                        applyOutfitToStage(outfit);
+                        stageOutfitEl.classList.remove('slide-out', 'fade-out');
+                        stageOutfitEl.classList.add(transitionType === 'slide' ? 'slide-in' : 'fade-in');
+                        
+                        setTimeout(() => {
+                            stageOutfitEl.classList.remove('slide-in', 'fade-in');
+                        }, transitionMs);
+                    }, transitionMs / 2);
+                } else {
+                    applyOutfitToStage(outfit);
+                }
+            }
+
+            function applyOutfitToStage(outfit) {
                 clearStage();
                 if (!outfit) return;
 
-                if (outfit.tops) stageSlots.tops.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
-                if (outfit.outerwear) stageSlots.outerwear.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
-                if (outfit.bottoms) stageSlots.bottoms.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
-                if (outfit.shoes) stageSlots.shoes.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
-                if (outfit.accessories) stageSlots.accessories.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
-            }
-
-            function parseSequence() {
-                if (!outfitSequenceInput.value.trim()) {
-                    return showOutiftsIndicesDefault();
+                if (outfit.tops && stageSlots.tops) stageSlots.tops.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+                if (outfit.outerwear && stageSlots.outerwear) stageSlots.outerwear.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
+                if (outfit.bottoms && stageSlots.bottoms) stageSlots.bottoms.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+                if (outfit.shoes && stageSlots.shoes) stageSlots.shoes.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
+                if (outfit.accessories && stageSlots.accessories) stageSlots.accessories.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
+                
+                // Show outfit name and/or designer
+                let displayText = '';
+                if (outfit.designer) {
+                    displayText = outfit.name 
+                        ? `${outfit.name} by ${outfit.designer}` 
+                        : `by ${outfit.designer}`;
+                } else if (outfit.name) {
+                    displayText = outfit.name;
                 }
 
-                const parts = outfitSequenceInput.value.split(',');
-                const indices = [];
-                parts.forEach(p => {
-                    const n = parseInt(p.trim(), 10);
-                    if (!Number.isNaN(n) && n >= 1 && n <= showOutfits.length) {
-                        indices.push(n - 1);
-                    }
-                });
-                return indices.length ? indices : showOutiftsIndicesDefault();
+                if (displayText) {
+                    stageOutfitName.textContent = displayText;
+                    stageOutfitName.classList.remove('hidden');
+                }
             }
 
-            function showOutiftsIndicesDefault() {
+            function getShowSequence() {
+                if (timelineSequence.length > 0) {
+                    return timelineSequence.filter(idx => idx < showOutfits.length);
+                }
                 return showOutfits.map((_, idx) => idx);
+            }
+
+            function updateProgress() {
+                const total = showOrder.length;
+                const current = currentShowIndex + 1;
+                const percent = (current / total) * 100;
+                showProgressBar.style.width = percent + '%';
+                
+                const outfit = showOutfits[showOrder[currentShowIndex]];
+                const label = outfit?.name || `Outfit ${current}`;
+                showProgressText.textContent = `${label} • ${current} of ${total}`;
+                
+                // Update stage counter overlay
+                if (stageCounter) {
+                    stageCounter.textContent = `${current} / ${total}`;
+                    stageCounter.classList.remove('hidden');
+                }
+
+                // Update timeline highlighting (guard when timeline UI is hidden)
+                if (showTimeline) {
+                    showTimeline.querySelectorAll('.timeline-item').forEach((item, idx) => {
+                        if (idx === currentShowIndex) {
+                            item.classList.add('playing');
+                        } else {
+                            item.classList.remove('playing');
+                        }
+                    });
+                }
+                
+                // Update gallery card highlighting
+                const currentOutfitIndex = showOrder[currentShowIndex];
+                fashionShowGrid.querySelectorAll('.gallery-card').forEach(card => {
+                    if (parseInt(card.dataset.outfitIndex) === currentOutfitIndex) {
+                        card.classList.add('ring-4', 'ring-green-400', 'ring-opacity-75');
+                    } else {
+                        card.classList.remove('ring-4', 'ring-green-400', 'ring-opacity-75');
+                    }
+                });
             }
 
             function startFashionShow() {
@@ -889,22 +2421,39 @@
                     if (!showOutfits.length) return;
                 }
 
-                showOrder = parseSequence();
-                if (!showOrder.length) return;
+                showOrder = getShowSequence();
+                if (!showOrder.length) {
+                    showStatus.textContent = 'Add outfits to timeline or load outfit codes first.';
+                    return;
+                }
 
                 const outfitSeconds = Math.max(0.5, parseFloat(outfitDurationInput.value) || 4);
                 const transitionSeconds = Math.max(0, parseFloat(transitionDurationInput.value) || 1);
                 const totalSeconds = outfitSeconds + transitionSeconds;
+                const intervalMs = Math.round(totalSeconds * 1000);
 
                 applySpotlightColors();
                 currentShowIndex = 0;
+                isPaused = false;
                 playCurrentOutfit();
+                updateProgress();
 
-                if (showTimer) clearInterval(showTimer);
-                showTimer = setInterval(() => {
-                    currentShowIndex = (currentShowIndex + 1) % showOrder.length;
-                    playCurrentOutfit();
-                }, totalSeconds * 1000);
+                // Clear any existing timer
+                if (showTimer) {
+                    clearInterval(showTimer);
+                    showTimer = null;
+                }
+                
+                // Set up auto-advance timer
+                showTimer = window.setInterval(function advanceShow() {
+                    if (!isPaused) {
+                        currentShowIndex = (currentShowIndex + 1) % showOrder.length;
+                        playCurrentOutfit();
+                        updateProgress();
+                        // Visual feedback that timer is running
+                        showStatus.textContent = `Playing outfit ${currentShowIndex + 1} of ${showOrder.length}`;
+                    }
+                }, intervalMs);
 
                 // Music
                 const songUrl = songSelect.value;
@@ -916,19 +2465,41 @@
                     audioPlayer = new Audio(songUrl);
                     audioPlayer.loop = true;
                     audioPlayer.play().catch(() => {
-                        showStatus.textContent = 'Tap anywhere to allow audio playback.';
+                        showStatus.textContent = 'Click anywhere to allow audio playback.';
                     });
                 }
 
                 startShowBtn.classList.add('hidden');
                 stopShowBtn.classList.remove('hidden');
-                showStatus.textContent = `Playing ${showOrder.length} outfits • ${outfitSeconds}s each (+${transitionSeconds}s).`;
+                manualNavControls.classList.remove('hidden');
+                manualNavControls.style.display = 'flex';
+                pauseShowBtn.textContent = '⏸ Pause';
+                showStatus.textContent = `Playing ${showOrder.length} outfits • ${outfitSeconds}s each`;
             }
 
             function playCurrentOutfit() {
-                const index = showOrder[currentShowIndex];
-                const outfit = showOutfits[index];
-                showOutfitOnStage(outfit);
+                try {
+                    const index = showOrder[currentShowIndex];
+                    const outfit = showOutfits[index];
+                    
+                    if (!outfit) {
+                        console.error('No outfit found at index:', index);
+                        return;
+                    }
+                    
+                    // Apply per-outfit spotlight colors from combined show
+                    if (window.combinedShowSpotlights && window.combinedShowSpotlights[currentShowIndex]) {
+                        const colors = window.combinedShowSpotlights[currentShowIndex];
+                        lightColor1Input.value = colors.color1;
+                        lightColor2Input.value = colors.color2;
+                        lightColor3Input.value = colors.color3;
+                        applySpotlightColors();
+                    }
+                    
+                    showOutfitOnStage(outfit);
+                } catch (e) {
+                    console.error('Error in playCurrentOutfit:', e);
+                }
             }
 
             function stopFashionShow() {
@@ -941,58 +2512,159 @@
                     audioPlayer = null;
                 }
                 clearStage();
-                stageSpotlight.classList.remove('stage-spotlight-active');
                 startShowBtn.classList.remove('hidden');
                 stopShowBtn.classList.add('hidden');
+                manualNavControls.classList.add('hidden');
+                showProgressBar.style.width = '0%';
+                showProgressText.textContent = '';
+                if (showTimeline) {
+                    showTimeline.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('playing'));
+                }
                 showStatus.textContent = 'Show stopped.';
+                
+                // Hide stage counter
+                if (stageCounter) stageCounter.classList.add('hidden');
+                
+                // Clear gallery highlighting
+                fashionShowGrid.querySelectorAll('.gallery-card').forEach(card => {
+                    card.classList.remove('ring-4', 'ring-green-400', 'ring-opacity-75');
+                });
+                
+                // Clear combined show spotlight data
+                window.combinedShowSpotlights = null;
+            }
+
+            function togglePause() {
+                isPaused = !isPaused;
+                pauseShowBtn.textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+                if (audioPlayer) {
+                    isPaused ? audioPlayer.pause() : audioPlayer.play();
+                }
+            }
+
+            function goToPrevOutfit() {
+                currentShowIndex = (currentShowIndex - 1 + showOrder.length) % showOrder.length;
+                playCurrentOutfit();
+                updateProgress();
+            }
+
+            function goToNextOutfit() {
+                currentShowIndex = (currentShowIndex + 1) % showOrder.length;
+                playCurrentOutfit();
+                updateProgress();
             }
 
             // --- EVENT LISTENERS ---
             randomizeBtn.addEventListener('click', randomizeOutfit);
             clearBtn.addEventListener('click', clearOutfit);
 
-            // View toggle
             showBuilderBtn.addEventListener('click', () => toggleView('builder'));
             showGalleryBtn.addEventListener('click', () => toggleView('gallery'));
 
-            // Modal
             submitOutfitBtn.addEventListener('click', openSubmitModal);
             closeModalBtn.addEventListener('click', closeSubmitModal);
             copyCodeBtn.addEventListener('click', copyCodeToClipboard);
-            // Close modal if clicking outside the content
             window.addEventListener('click', (event) => {
-                if (event.target == submitModal) {
-                    closeSubmitModal();
-                }
+                if (event.target == submitModal) closeSubmitModal();
             });
 
-            // Gallery
-            loadShowBtn.addEventListener('click', loadFashionShow);
+            loadShowBtn.addEventListener('click', () => {
+                loadFashionShow();
+                renderTimeline();
+            });
             startShowBtn.addEventListener('click', startFashionShow);
             stopShowBtn.addEventListener('click', stopFashionShow);
+            
+            prevOutfitBtn.addEventListener('click', goToPrevOutfit);
+            pauseShowBtn.addEventListener('click', togglePause);
+            nextOutfitBtn.addEventListener('click', goToNextOutfit);
 
             lightColor1Input.addEventListener('input', applySpotlightColors);
             lightColor2Input.addEventListener('input', applySpotlightColors);
             lightColor3Input.addEventListener('input', applySpotlightColors);
 
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+            saveShowBtn.addEventListener('click', saveCurrentShow);
+            exportShowBtn.addEventListener('click', exportShowToJSON);
+            importShowInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    importShowFromJSON(e.target.files[0]);
+                    e.target.value = '';
+                }
+            });
+
             copyShowLinkBtn.addEventListener('click', () => {
                 const url = buildShowShareUrl();
-                const tempInput = document.createElement('input');
-                tempInput.value = url;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                tempInput.setSelectionRange(0, 99999);
-                try {
+                navigator.clipboard.writeText(url).then(() => {
+                    showStatus.textContent = 'Shareable show link copied!';
+                }).catch(() => {
+                    const tempInput = document.createElement('input');
+                    tempInput.value = url;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
                     document.execCommand('copy');
-                    showStatus.textContent = 'Shareable show link copied to clipboard.';
-                } catch (e) {
-                    showStatus.textContent = 'Could not copy automatically. Please copy the URL from the address bar.';
+                    document.body.removeChild(tempInput);
+                    showStatus.textContent = 'Shareable show link copied!';
+                });
+            });
+
+            // Multi-designer show event listeners
+            getShowCodeBtn.addEventListener('click', openShowCodeModal);
+            closeShowCodeModalBtn.addEventListener('click', closeShowCodeModal);
+            copyShowCodeBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(showCodeDisplay.textContent).then(() => {
+                    showCodeCopyFeedback.textContent = 'Copied!';
+                    setTimeout(() => showCodeCopyFeedback.textContent = '', 2000);
+                });
+            });
+            window.addEventListener('click', (e) => {
+                if (e.target === showCodeModal) closeShowCodeModal();
+            });
+
+            addDesignerBtn.addEventListener('click', addDesignerFromCode);
+            designerCodeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addDesignerFromCode();
+            });
+            buildCombinedShowBtn.addEventListener('click', buildRoundRobinShow);
+            clearCollectionBtn.addEventListener('click', clearCollection);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Escape exits fullscreen first, then stops show
+                if (e.code === 'Escape') {
+                    if (stageWrapper.classList.contains('fullscreen-mode')) {
+                        e.preventDefault();
+                        toggleFullscreen();
+                        return;
+                    }
                 }
-                document.body.removeChild(tempInput);
+                
+                if (showTimer && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        togglePause();
+                    } else if (e.code === 'ArrowLeft') {
+                        e.preventDefault();
+                        goToPrevOutfit();
+                    } else if (e.code === 'ArrowRight') {
+                        e.preventDefault();
+                        goToNextOutfit();
+                    } else if (e.code === 'Escape') {
+                        e.preventDefault();
+                        stopFashionShow();
+                    } else if (e.code === 'KeyF') {
+                        e.preventDefault();
+                        toggleFullscreen();
+                    }
+                }
             });
 
             // --- INITIALIZATION ---
             renderCloset();
+            renderRecentOutfits();
+            renderSavedShows();
+            renderCollectedDesigners();
             applySpotlightColors();
             applyUrlShowConfig();
         });
