@@ -1922,25 +1922,27 @@
 
                                 const dress = currentOutfit.dresses;
 
-                // If a dress is selected, paint it into BOTH top + bottom slots
-                if (dress) {
-                    const topSlot = document.getElementById('mannequin-tops');
-                    const bottomSlot = document.getElementById('mannequin-bottoms');
+// If a dress is selected, paint it into ONLY the top slot
+if (dress) {
+    const topSlot = document.getElementById('mannequin-tops');
+    const bottomSlot = document.getElementById('mannequin-bottoms');
 
-                    if (topSlot) {
-                        topSlot.style.backgroundImage = `url(${dress.imageUrl})`;
-                        const ph = topSlot.querySelector('span');
-                        if (ph) ph.style.opacity = '0';
-                    }
+    if (topSlot) {
+        topSlot.style.backgroundImage = `url(${dress.imageUrl})`;
+        const ph = topSlot.querySelector('span');
+        if (ph) ph.style.opacity = '0';
+    }
 
-                    if (bottomSlot) {
-                        bottomSlot.style.backgroundImage = `url(${dress.imageUrl})`;
-                        const ph = bottomSlot.querySelector('span');
-                        if (ph) ph.style.opacity = '0';
-                    }
+    // Clear bottoms (dress replaces the need for bottoms)
+    if (bottomSlot) {
+        bottomSlot.style.backgroundImage = 'none';
+        const ph = bottomSlot.querySelector('span');
+        if (ph) ph.style.opacity = '1';
+    }
 
-                    isMainOutfitEmpty = false;
-                }
+    isMainOutfitEmpty = false;
+}
+
 
                 for (const category in currentOutfit) {
                                         if (dress && (category === 'tops' || category === 'bottoms')) continue;
@@ -2199,8 +2201,7 @@
 
                 const bottomSlot = document.createElement('div');
                 bottomSlot.className = 'gallery-slot slot-bottoms absolute top-[40%] left-0 w-full h-[45%]';
-                if (outfit.dresses) bottomSlot.style.backgroundImage = `url(${outfit.dresses.imageUrl})`;
-                else if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+                if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
 
                 
                 const shoeSlot = document.createElement('div');
@@ -2522,12 +2523,18 @@
                 clearStage();
                 if (!outfit) return;
 
+                if (outfit.dresses) {
+                if (stageSlots.tops) stageSlots.tops.style.backgroundImage = `url(${outfit.dresses.imageUrl})`;
+                if (stageSlots.bottoms) stageSlots.bottoms.style.backgroundImage = 'none';
+} else {
                 if (outfit.tops && stageSlots.tops) stageSlots.tops.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
-                if (outfit.outerwear && stageSlots.outerwear) stageSlots.outerwear.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
                 if (outfit.bottoms && stageSlots.bottoms) stageSlots.bottoms.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+}
+
                 if (outfit.shoes && stageSlots.shoes) stageSlots.shoes.style.backgroundImage = `url(${outfit.shoes.imageUrl})`;
                 if (outfit.accessories && stageSlots.accessories) stageSlots.accessories.style.backgroundImage = `url(${outfit.accessories.imageUrl})`;
-                
+                if (outfit.outerwear && stageSlots.outerwear) stageSlots.outerwear.style.backgroundImage = `url(${outfit.outerwear.imageUrl})`;
+               
                 // Show outfit name and/or designer
                 let displayText = '';
                 if (outfit.designer) {
