@@ -1831,48 +1831,57 @@
             // --- FUNCTIONS ---
 
             function renderCloset() {
-                closetElement.innerHTML = '';
-                for (const category in closetData) {
-                    const categoryContainer = document.createElement('div');
-                    
-                    const categoryTitle = document.createElement('h3');
-                    categoryTitle.className = 'text-xl font-semibold capitalize text-gray-700 border-b-2 border-gray-200 pb-2 mb-4';
-                    categoryTitle.textContent = category;
-                    categoryContainer.appendChild(categoryTitle);
+  closetElement.innerHTML = '';
 
-                    const itemsGrid = document.createElement('div');
-                    itemsGrid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4';
+  for (const category in closetData) {
+    // Row container
+    const categoryContainer = document.createElement('div');
+    categoryContainer.className = 'space-y-3';
 
-                    closetData[category].forEach(item => {
-                        const itemCard = document.createElement('div');
-                        itemCard.className = 'item-card cursor-pointer border-2 border-transparent bg-gray-100 p-2 rounded-lg text-center';
-                        itemCard.dataset.category = category;
-                        itemCard.dataset.id = item.id;
+    // Title
+    const categoryTitle = document.createElement('h3');
+    categoryTitle.className =
+      'text-xl font-semibold capitalize text-gray-700 border-b-2 border-gray-200 pb-2';
+    categoryTitle.textContent = category;
+    categoryContainer.appendChild(categoryTitle);
 
-                        const itemImg = document.createElement('img');
-                        itemImg.src = item.imageUrl;
-                        itemImg.alt = item.name;
-                        itemImg.className = 'w-full h-24 md:h-32 object-contain rounded-md mb-2';
-                        itemImg.onerror = () => {
-                            itemImg.src = `https://placehold.co/200x200/CCCCCC/FFFFFF?text=Error`;
-                            itemImg.alt = 'Image not found';
-                        };
+    // Horizontal scroll row
+    const itemsRow = document.createElement('div');
+    itemsRow.className =
+      'closet-row flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory';
 
-                        const itemName = document.createElement('p');
-                        itemName.className = 'text-sm font-medium text-gray-700';
-                        itemName.textContent = item.name;
+    closetData[category].forEach((item) => {
+      const itemCard = document.createElement('div');
+      itemCard.className =
+        'item-card snap-start flex-shrink-0 w-40 cursor-pointer border-2 border-transparent bg-gray-100 p-2 rounded-lg text-center';
+      itemCard.dataset.category = category;
+      itemCard.dataset.id = item.id;
 
-                        itemCard.appendChild(itemImg);
-                        itemCard.appendChild(itemName);
-                        itemsGrid.appendChild(itemCard);
+      const itemImg = document.createElement('img');
+      itemImg.src = item.imageUrl;
+      itemImg.alt = item.name;
+      itemImg.className = 'w-full h-24 md:h-28 object-contain rounded-md mb-2';
+      itemImg.onerror = () => {
+        itemImg.src = 'https://placehold.co/200x200/CCCCCC/FFFFFF?text=Error';
+        itemImg.alt = 'Image not found';
+      };
 
-                        itemCard.addEventListener('click', () => selectItem(category, item.id));
-                    });
+      const itemName = document.createElement('p');
+      itemName.className = 'text-sm font-medium text-gray-700';
+      itemName.textContent = item.name;
 
-                    categoryContainer.appendChild(itemsGrid);
-                    closetElement.appendChild(categoryContainer);
-                }
-            }
+      itemCard.appendChild(itemImg);
+      itemCard.appendChild(itemName);
+      itemsRow.appendChild(itemCard);
+
+      itemCard.addEventListener('click', () => selectItem(category, item.id));
+    });
+
+    categoryContainer.appendChild(itemsRow);
+    closetElement.appendChild(categoryContainer);
+  }
+}
+
             
             function selectItem(category, itemId) {
                 const selectedItem = closetData[category].find(item => item.id === itemId);
