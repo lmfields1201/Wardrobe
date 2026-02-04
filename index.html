@@ -1033,6 +1033,12 @@
 
 
                 ],
+                
+                dresses: [
+                    { id: 1, imageUrl: 'https://i.postimg.cc/T3fn0CC6/6464d11b-36ef-443d-8662-55b893b7b07f.png' },
+                ],
+
+                
                 bottoms: [
                     { id: 1, imageUrl: 'https://i.postimg.cc/cL7HChc3/00e0c4b2_79f7_4ee5_b705_1b3195bda055.png' },
                     { id: 2, imageUrl: 'https://i.postimg.cc/BvqvKFYG/10eed0c6_e5bc_4f82_8ef5_72d4afaafcb0.png' },
@@ -1117,10 +1123,12 @@
             let currentOutfit = {
                 tops: null,
                 bottoms: null,
+                dresses: null,
                 shoes: null,
                 accessories: null,
                 outerwear: null
             };
+
 
             // --- STORAGE KEYS ---
             const STORAGE_KEYS = {
@@ -1310,13 +1318,17 @@
 
             function generateDesignerCode(name, outfits) {
                 const cleanName = name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-                const outfitData = outfits.map(o => encodeOutfit({
-                    tops: o.tops?.id || 0,
-                    bottoms: o.bottoms?.id || 0,
-                    shoes: o.shoes?.id || 0,
-                    accessories: o.accessories?.id || 0,
-                    outerwear: o.outerwear?.id || 0
-                })).join('');
+                const outfitData = outfits.map(o => {
+                    const dressId = o.dresses?.id || 0;
+                    return encodeOutfit({
+                        tops: dressId || (o.tops?.id || 0),
+                        bottoms: dressId || (o.bottoms?.id || 0),
+                        shoes: o.shoes?.id || 0,
+                        accessories: o.accessories?.id || 0,
+                        outerwear: o.outerwear?.id || 0
+                    });
+                }).join('');
+
                 
                 // Include spotlight colors from designer's color pickers (6 hex chars each, no #)
                 const colors = [
@@ -1885,21 +1897,54 @@
             
             function selectItem(category, itemId) {
                 const selectedItem = closetData[category].find(item => item.id === itemId);
-                
-                if (currentOutfit[category] && currentOutfit[category].id === itemId) {
-                    currentOutfit[category] = null;
-                } else {
-                    currentOutfit[category] = selectedItem;
+
+                const isSame = currentOutfit[category] && currentOutfit[category].id === itemId;
+                currentOutfit[category] = isSame ? null : selectedItem;
+
+                // If selecting a dress, clear tops + bottoms
+                if (category === 'dresses' && currentOutfit.dresses) {
+                    currentOutfit.tops = null;
+                    currentOutfit.bottoms = null;
                 }
-                
+
+                // If selecting a top or bottom, clear dresses
+                if ((category === 'tops' || category === 'bottoms') && currentOutfit[category]) {
+                    currentOutfit.dresses = null;
+                }
+
                 updateMannequin();
                 updateSelectedStyles();
             }
+
             
             function updateMannequin() {
                 let isMainOutfitEmpty = true;
-                
+
+                                const dress = currentOutfit.dresses;
+
+                // If a dress is selected, paint it into BOTH top + bottom slots
+                if (dress) {
+                    const topSlot = document.getElementById('mannequin-tops');
+                    const bottomSlot = document.getElementById('mannequin-bottoms');
+
+                    if (topSlot) {
+                        topSlot.style.backgroundImage = `url(${dress.imageUrl})`;
+                        const ph = topSlot.querySelector('span');
+                        if (ph) ph.style.opacity = '0';
+                    }
+
+                    if (bottomSlot) {
+                        bottomSlot.style.backgroundImage = `url(${dress.imageUrl})`;
+                        const ph = bottomSlot.querySelector('span');
+                        if (ph) ph.style.opacity = '0';
+                    }
+
+                    isMainOutfitEmpty = false;
+                }
+
                 for (const category in currentOutfit) {
+                                        if (dress && (category === 'tops' || category === 'bottoms')) continue;
+
                     const mannequinSlot = document.getElementById(`mannequin-${category}`);
                     if (!mannequinSlot) continue;
 
@@ -1987,13 +2032,17 @@
             }
 
             function openSubmitModal() {
+                                const topId = currentOutfit.dresses ? currentOutfit.dresses.id : (currentOutfit.tops ? currentOutfit.tops.id : 0);
+                const bottomId = currentOutfit.dresses ? currentOutfit.dresses.id : (currentOutfit.bottoms ? currentOutfit.bottoms.id : 0);
+
                 const code = [
-                    currentOutfit.tops ? currentOutfit.tops.id : 0,
-                    currentOutfit.bottoms ? currentOutfit.bottoms.id : 0,
+                    topId,
+                    bottomId,
                     currentOutfit.shoes ? currentOutfit.shoes.id : 0,
                     currentOutfit.accessories ? currentOutfit.accessories.id : 0,
                     currentOutfit.outerwear ? currentOutfit.outerwear.id : 0
                 ].join('-');
+
                 
                 outfitCodeOutput.value = code;
                 outfitNameInput.value = '';
@@ -2077,9 +2126,18 @@
                 const ids = codeStr.split('-');
                 if (ids.length !== 5) return null;
 
+                                const topId = parseInt(ids[0]);
+                const bottomId = parseInt(ids[1]);
+
+                const dressItem =
+                    (topId === bottomId && closetData.dresses)
+                        ? closetData.dresses.find(item => item.id === topId)
+                        : null;
+
                 return {
-                    tops: closetData.tops.find(item => item.id === parseInt(ids[0])),
-                    bottoms: closetData.bottoms.find(item => item.id === parseInt(ids[1])),
+                    dresses: dressItem,
+                    tops: dressItem ? null : closetData.tops.find(item => item.id === topId),
+                    bottoms: dressItem ? null : closetData.bottoms.find(item => item.id === bottomId),
                     shoes: closetData.shoes.find(item => item.id === parseInt(ids[2])),
                     accessories: closetData.accessories.find(item => item.id === parseInt(ids[3])),
                     outerwear: closetData.outerwear.find(item => item.id === parseInt(ids[4])),
@@ -2087,6 +2145,7 @@
                     name: name,
                     designer: designer
                 };
+
             }
 
             function loadFashionShow() {
@@ -2130,7 +2189,9 @@
 
                 const topSlot = document.createElement('div');
                 topSlot.className = 'gallery-slot slot-tops absolute top-[8%] left-0 w-full h-[45%]';
-                if (outfit.tops) topSlot.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+                if (outfit.dresses) topSlot.style.backgroundImage = `url(${outfit.dresses.imageUrl})`;
+                else if (outfit.tops) topSlot.style.backgroundImage = `url(${outfit.tops.imageUrl})`;
+
 
                 const outerwearSlot = document.createElement('div');
                 outerwearSlot.className = 'gallery-slot slot-outerwear absolute top-[8%] left-0 w-full h-[45%]';
@@ -2138,7 +2199,9 @@
 
                 const bottomSlot = document.createElement('div');
                 bottomSlot.className = 'gallery-slot slot-bottoms absolute top-[40%] left-0 w-full h-[45%]';
-                if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+                if (outfit.dresses) bottomSlot.style.backgroundImage = `url(${outfit.dresses.imageUrl})`;
+                else if (outfit.bottoms) bottomSlot.style.backgroundImage = `url(${outfit.bottoms.imageUrl})`;
+
                 
                 const shoeSlot = document.createElement('div');
                 shoeSlot.className = 'gallery-slot slot-shoes absolute bottom-[2%] left-0 w-full h-[22%]';
